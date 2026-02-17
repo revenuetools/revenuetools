@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Percentage Calculator — Percent of, Increase & Decrease | CalcStack</title>
+  <meta name="description" content="Free percentage calculator. Calculate percent of a number, percentage increase, and percentage decrease instantly.">
+
+  <link rel="canonical" href="https://calcstack.tools/percentage-calculator">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+
+<body class="page">
+  <div class="container">
+
+    <h1 style="margin-bottom:8px;">Percentage Calculator</h1>
+
+    <p class="subtitle" style="max-width:760px;margin:0 auto 18px;">
+      Calculate percent of a number, percentage increase, and percentage decrease.
+    </p>
+
+    <div class="card" style="max-width:920px;margin:0 auto;">
+
+      <!-- 1) Percent of -->
+      <h2 style="margin:0 0 8px;">1) What is X% of Y?</h2>
+
+      <div class="row">
+        <div>
+          <label for="p1x">X (%)</label>
+          <input id="p1x" type="number" inputmode="decimal" step="0.01" value="20">
+        </div>
+        <div>
+          <label for="p1y">Y</label>
+          <input id="p1y" type="number" inputmode="decimal" step="0.01" value="250">
+        </div>
+      </div>
+
+      <div class="results" style="margin-top:12px;">
+        <div class="kpi">
+          <div class="kpiBox">
+            <div class="label">Result</div>
+            <div class="value" id="p1out">—</div>
+            <div class="muted">X% of Y</div>
+          </div>
+        </div>
+      </div>
+
+      <hr style="border:0;border-top:1px solid rgba(255,255,255,0.10);margin:18px 0;">
+
+      <!-- 2) Percent change -->
+      <h2 style="margin:0 0 8px;">2) Percentage change</h2>
+
+      <div class="row">
+        <div>
+          <label for="oldVal">Old value</label>
+          <input id="oldVal" type="number" inputmode="decimal" step="0.01" value="100">
+        </div>
+        <div>
+          <label for="newVal">New value</label>
+          <input id="newVal" type="number" inputmode="decimal" step="0.01" value="125">
+        </div>
+      </div>
+
+      <div class="results" style="margin-top:12px;">
+        <div class="kpi">
+          <div class="kpiBox">
+            <div class="label">Change</div>
+            <div class="value" id="chgOut">—</div>
+            <div class="muted">Increase or decrease (%)</div>
+          </div>
+          <div class="kpiBox">
+            <div class="label">Difference</div>
+            <div class="value" id="diffOut">—</div>
+            <div class="muted">New − Old</div>
+          </div>
+        </div>
+        <div class="muted breakdown" id="breakdown"></div>
+      </div>
+
+      <div class="actions" style="align-items:center;">
+        <button id="calcBtn" type="button">Calculate</button>
+        <button class="secondary" id="resetBtn" type="button">Reset</button>
+        <a href="/" style="margin-left:6px;">Back to all tools</a>
+      </div>
+
+      <div class="muted" style="margin-top:12px;font-size:12px;line-height:1.4;">
+        Formulas: X% of Y = (X ÷ 100) × Y · % Change = ((New − Old) ÷ Old) × 100
+      </div>
+
+    </div>
+
+    <div class="footer">© <span id="yearNow"></span> CalcStack.tools</div>
+
+  </div>
+
+<script>
+  const fmtNumber = (n) => {
+    const v = Number.isFinite(n) ? n : 0;
+    return new Intl.NumberFormat(undefined, { maximumFractionDigits: 6 }).format(v);
+  };
+
+  const pct = (n) => (Number.isFinite(n) ? n : 0).toFixed(2) + "%";
+
+  const getVal = (id) => {
+    const v = parseFloat(document.getElementById(id).value);
+    return Number.isFinite(v) ? v : 0;
+  };
+
+  function calculate(){
+    // 1) Percent of
+    const x = getVal("p1x");
+    const y = getVal("p1y");
+    const pOf = (x / 100) * y;
+
+    document.getElementById("p1out").textContent = fmtNumber(pOf);
+
+    // 2) Percent change
+    const oldV = getVal("oldVal");
+    const newV = getVal("newVal");
+
+    const diff = newV - oldV;
+
+    let change = 0;
+    if (oldV !== 0) change = (diff / oldV) * 100;
+
+    const sign = change > 0 ? "+" : "";
+    document.getElementById("chgOut").textContent = sign + pct(change);
+    document.getElementById("diffOut").textContent = fmtNumber(diff);
+
+    document.getElementById("breakdown").textContent =
+      `Old: ${fmtNumber(oldV)} · New: ${fmtNumber(newV)} · Difference: ${fmtNumber(diff)} · Change: ${sign}${pct(change)}`;
+  }
+
+  function resetAll(){
+    document.getElementById("p1x").value = 20;
+    document.getElementById("p1y").value = 250;
+    document.getElementById("oldVal").value = 100;
+    document.getElementById("newVal").value = 125;
+    calculate();
+  }
+
+  document.getElementById("calcBtn").addEventListener("click", calculate);
+  document.getElementById("resetBtn").addEventListener("click", resetAll);
+
+  ["p1x","p1y","oldVal","newVal"].forEach(id => {
+    document.getElementById(id).addEventListener("input", calculate);
+    document.getElementById(id).addEventListener("keydown", (e) => {
+      if(e.key === "Enter") calculate();
+    });
+  });
+
+  document.getElementById("yearNow").textContent = new Date().getFullYear();
+  calculate();
+</script>
+
+</body>
+</html>
