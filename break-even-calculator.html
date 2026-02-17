@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Break-Even Calculator — Units & Revenue Needed | CalcStack</title>
+  <meta name="description" content="Free break-even calculator. Calculate how many units you need to sell to break even, plus revenue needed, profit per unit, and margin.">
+
+  <link rel="canonical" href="https://calcstack.tools/break-even-calculator">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+
+<body class="page">
+  <div class="container">
+
+    <h1 style="margin-bottom:8px;">Break-Even Calculator</h1>
+
+    <p class="subtitle" style="max-width:760px;margin:0 auto 18px;">
+      Calculate how many units you must sell to break even — plus revenue needed and profit per unit.
+    </p>
+
+    <div class="card" style="max-width:920px;margin:0 auto;">
+
+      <div class="row">
+        <div>
+          <label for="fixedCosts">Fixed costs (£)</label>
+          <input id="fixedCosts" type="number" inputmode="decimal" min="0" step="0.01" value="1000">
+        </div>
+
+        <div>
+          <label for="price">Price per unit (£)</label>
+          <input id="price" type="number" inputmode="decimal" min="0" step="0.01" value="25">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="variableCost">Variable cost per unit (£)</label>
+          <input id="variableCost" type="number" inputmode="decimal" min="0" step="0.01" value="10">
+        </div>
+
+        <div>
+          <label for="targetProfit">Target profit (£) <span class="hint">optional</span></label>
+          <input id="targetProfit" type="number" inputmode="decimal" min="0" step="0.01" value="0" placeholder="e.g. 500">
+        </div>
+      </div>
+
+      <div class="actions" style="align-items:center;">
+        <button id="calcBtn" type="button">Calculate</button>
+        <button class="secondary" id="resetBtn" type="button">Reset</button>
+        <a href="/" style="margin-left:6px;">Back to all tools</a>
+      </div>
+
+      <div class="results" style="margin-top:16px;">
+        <div class="kpi">
+
+          <div class="kpiBox">
+            <div class="label">Profit per unit</div>
+            <div class="value" id="ppu">—</div>
+            <div class="muted">Price − variable cost</div>
+          </div>
+
+          <div class="kpiBox">
+            <div class="label">Break-even units</div>
+            <div class="value" id="units">—</div>
+            <div class="muted">Fixed costs ÷ profit per unit</div>
+          </div>
+
+          <div class="kpiBox">
+            <div class="label">Revenue needed</div>
+            <div class="value" id="revenueNeeded">—</div>
+            <div class="muted">Units × price</div>
+          </div>
+
+          <div class="kpiBox">
+            <div class="label">Margin</div>
+            <div class="value" id="margin">—</div>
+            <div class="muted">Profit per unit ÷ price</div>
+          </div>
+
+        </div>
+
+        <div class="muted breakdown" id="breakdown"></div>
+      </div>
+
+      <div class="muted" style="margin-top:12px;font-size:12px;line-height:1.4;">
+        Note: If variable cost is equal to or higher than price, break-even isn’t possible with these values.
+      </div>
+
+    </div>
+
+    <div class="footer">© <span id="yearNow"></span> CalcStack.tools</div>
+
+  </div>
+
+<script>
+  const moneyGBP = (n) => {
+    const v = Number.isFinite(n) ? n : 0;
+    return new Intl.NumberFormat(undefined, { style: "currency", currency: "GBP" }).format(v);
+  };
+
+  const pct = (n) => (Number.isFinite(n) ? n : 0).toFixed(2) + "%";
+
+  const getVal = (id) => {
+    const v = parseFloat(document.getElementById(id).value);
+    return Number.isFinite(v) ? v : 0;
+  };
+
+  function calculate(){
+    const fixed = Math.max(0, getVal("fixedCosts"));
+    const price = Math.max(0, getVal("price"));
+    const variable = Math.max(0, getVal("variableCost"));
+    const targetProfit = Math.max(0, getVal("targetProfit"));
+
+    const profitPerUnit = price - variable;
+    const totalToCover = fixed + targetProfit;
+
+    let units = Infinity;
+    if (profitPerUnit > 0) units = totalToCover / profitPerUnit;
+
+    const unitsRounded = Number.isFinite(units) ? Math.ceil(units) : Infinity;
+    const revenue = Number.isFinite(unitsRounded) ? unitsRounded * price : 0;
+
+    let margin = 0;
+    if (price > 0) margin = (profitPerUnit / price) * 100;
+
+    document.getElementById("ppu").textContent = moneyGBP(profitPerUnit);
+    document.getElementById("margin").textContent = pct(margin);
+
+    if (!Number.isFinite(unitsRounded)) {
+      document.getElementById("units").textContent = "—";
+      document.getElementById("revenueNeeded").textContent = "—";
+      document.getElementById("breakdown").textContent =
+        `Your variable cost is greater than or equal to your price, so break-even isn’t possible with these numbers.`;
+      return;
+    }
+
+    document.getElementById("units").textContent = unitsRounded.toLocaleString();
+    document.getElementById("revenueNeeded").textContent = moneyGBP(revenue);
+
+    document.getElementById("breakdown").textContent =
+      `Fixed costs: ${moneyGBP(fixed)} · Target profit: ${moneyGBP(targetProfit)} · ` +
+      `Profit/unit: ${moneyGBP(profitPerUnit)} · Break-even units: ${unitsRounded.toLocaleString()} · ` +
+      `Revenue needed: ${moneyGBP(revenue)} · Margin: ${pct(margin)}`;
+  }
+
+  function resetAll(){
+    document.getElementById("fixedCosts").value = 1000;
+    document.getElementById("price").value = 25;
+    document.getElementById("variableCost").value = 10;
+    document.getElementById("targetProfit").value = 0;
+    calculate();
+  }
+
+  document.getElementById("calcBtn").addEventListener("click", calculate);
+  document.getElementById("resetBtn").addEventListener("click", resetAll);
+
+  ["fixedCosts","price","variableCost","targetProfit"].forEach(id => {
+    document.getElementById(id).addEventListener("input", calculate);
+    document.getElementById(id).addEventListener("keydown", (e) => {
+      if(e.key === "Enter") calculate();
+    });
+  });
+
+  document.getElementById("yearNow").textContent = new Date().getFullYear();
+  calculate();
+</script>
+
+</body>
+</html>
