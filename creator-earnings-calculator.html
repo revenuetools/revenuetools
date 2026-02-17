@@ -5,101 +5,143 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>Creator Earnings Calculator — Estimate Subscription Income | CalcStack</title>
-
   <meta name="description" content="Free creator earnings calculator. Estimate monthly and yearly income from subscriptions, tips, and extra sales. Works for Patreon, OnlyFans, YouTube memberships, and more.">
-
   <link rel="canonical" href="https://calcstack.tools/creator-earnings-calculator">
+
   <link rel="stylesheet" href="/css/styles.css">
 </head>
 
-<body class="page">
+<body>
+  <div class="container">
+    <h1 style="margin-bottom:8px;">Creator Earnings Calculator</h1>
+    <p class="subtitle" style="max-width:720px;margin:0 auto 18px;">
+      Estimate monthly and yearly earnings from subscriptions, tips, and extra sales.
+    </p>
 
-<div class="container">
+    <div class="card" style="max-width:920px;margin:0 auto;">
+      <div class="row">
+        <div>
+          <label for="subs">Subscribers</label>
+          <input id="subs" type="number" inputmode="numeric" min="0" step="1" value="100">
+        </div>
+        <div>
+          <label for="price">Subscription price (£)</label>
+          <input id="price" type="number" inputmode="decimal" min="0" step="0.01" value="10">
+        </div>
+      </div>
 
-  <div class="titleRow">
-    <div>
-      <h1>Creator Earnings Calculator</h1>
-      <p class="subtitle">
-        Estimate your subscription-based income quickly and easily.
-      </p>
+      <div class="row">
+        <div>
+          <label for="extras">Extra sales per month (£)</label>
+          <input id="extras" type="number" inputmode="decimal" min="0" step="0.01" value="500">
+        </div>
+        <div>
+          <label for="tips">Tips per month (£)</label>
+          <input id="tips" type="number" inputmode="decimal" min="0" step="0.01" value="200">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="fee">Platform fee (%)</label>
+          <input id="fee" type="number" inputmode="decimal" min="0" max="100" step="0.1" value="20">
+        </div>
+        <div>
+          <label for="expenses">Monthly expenses (£) <span style="color:var(--muted2);font-size:12px;">optional</span></label>
+          <input id="expenses" type="number" inputmode="decimal" min="0" step="0.01" value="0" placeholder="e.g. 150">
+        </div>
+      </div>
+
+      <div class="actions" style="align-items:center;">
+        <button id="calcBtn" type="button">Calculate</button>
+        <button class="secondary" id="resetBtn" type="button">Reset</button>
+        <a href="/" style="margin-left:6px;">Back to all tools</a>
+      </div>
+
+      <div class="results" id="results" style="margin-top:16px;">
+        <div class="kpi">
+          <div class="kpiBox">
+            <div class="label">Estimated monthly (net)</div>
+            <div class="value" id="monthlyNet">—</div>
+            <div class="muted">After platform fee + expenses</div>
+          </div>
+          <div class="kpiBox">
+            <div class="label">Estimated yearly (net)</div>
+            <div class="value" id="yearlyNet">—</div>
+            <div class="muted">Monthly × 12</div>
+          </div>
+        </div>
+
+        <div class="muted" id="breakdown" style="margin-top:10px;"></div>
+      </div>
+
+      <div class="muted" style="margin-top:12px;font-size:12px;line-height:1.4;">
+        Note: This is an estimate. Taxes vary by country and are not included.
+      </div>
     </div>
+
+    <div class="footer">© 2026 CalcStack.tools</div>
   </div>
 
-  <div class="card panel">
+  <script>
+    const moneyGBP = (n) => {
+      const v = Number.isFinite(n) ? n : 0;
+      return new Intl.NumberFormat(undefined, { style: "currency", currency: "GBP" }).format(v);
+    };
 
-    <div class="row">
-      <div>
-        <label>Subscribers</label>
-        <input id="subs" type="number" value="100">
-      </div>
+    const getVal = (id) => {
+      const el = document.getElementById(id);
+      const v = parseFloat(el.value);
+      return Number.isFinite(v) ? v : 0;
+    };
 
-      <div>
-        <label>Subscription price (£)</label>
-        <input id="price" type="number" value="10">
-      </div>
-    </div>
+    function calculate() {
+      const subs = Math.max(0, getVal("subs"));
+      const price = Math.max(0, getVal("price"));
+      const extras = Math.max(0, getVal("extras"));
+      const tips = Math.max(0, getVal("tips"));
+      const feePct = Math.min(100, Math.max(0, getVal("fee")));
+      const expenses = Math.max(0, getVal("expenses"));
 
-    <div class="row">
-      <div>
-        <label>Extra sales per month (£)</label>
-        <input id="extras" type="number" value="500">
-      </div>
+      const grossSubs = subs * price;
+      const grossTotal = grossSubs + extras + tips;
 
-      <div>
-        <label>Tips per month (£)</label>
-        <input id="tips" type="number" value="200">
-      </div>
-    </div>
+      const fee = grossTotal * (feePct / 100);
+      const netBeforeExpenses = grossTotal - fee;
+      const monthlyNet = Math.max(0, netBeforeExpenses - expenses);
+      const yearlyNet = monthlyNet * 12;
 
-    <div class="row">
-      <div>
-        <label>Platform fee (%)</label>
-        <input id="fee" type="number" value="20">
-      </div>
-    </div>
+      document.getElementById("monthlyNet").textContent = moneyGBP(monthlyNet);
+      document.getElementById("yearlyNet").textContent = moneyGBP(yearlyNet);
 
-    <div class="actions">
-      <button onclick="calc()">Calculate</button>
-      <a href="/" class="secondaryBtn">Back to all tools</a>
-    </div>
+      document.getElementById("breakdown").textContent =
+        `Gross: ${moneyGBP(grossTotal)} (Subs: ${moneyGBP(grossSubs)}, Extras: ${moneyGBP(extras)}, Tips: ${moneyGBP(tips)}) · ` +
+        `Fee (${feePct}%): ${moneyGBP(fee)} · Expenses: ${moneyGBP(expenses)} · Net: ${moneyGBP(monthlyNet)}`;
+    }
 
-    <div class="results" id="result"></div>
+    function resetAll() {
+      document.getElementById("subs").value = 100;
+      document.getElementById("price").value = 10;
+      document.getElementById("extras").value = 500;
+      document.getElementById("tips").value = 200;
+      document.getElementById("fee").value = 20;
+      document.getElementById("expenses").value = 0;
+      calculate();
+    }
 
-  </div>
+    document.getElementById("calcBtn").addEventListener("click", calculate);
+    document.getElementById("resetBtn").addEventListener("click", resetAll);
 
-  <div class="footer">
-    © <span id="yearNow"></span> CalcStack.tools
-  </div>
+    // Auto-calc when values change (feels "app-like")
+    ["subs","price","extras","tips","fee","expenses"].forEach(id => {
+      document.getElementById(id).addEventListener("input", calculate);
+      document.getElementById(id).addEventListener("keydown", (e) => {
+        if (e.key === "Enter") calculate();
+      });
+    });
 
-</div>
-
-<script>
-document.getElementById("yearNow").textContent =
-new Date().getFullYear();
-
-function calc(){
-
-let subs = Number(document.getElementById("subs").value);
-
-let price = Number(document.getElementById("price").value);
-
-let extras = Number(document.getElementById("extras").value);
-
-let tips = Number(document.getElementById("tips").value);
-
-let fee = Number(document.getElementById("fee").value)/100;
-
-let gross = subs*price + extras + tips;
-
-let net = gross*(1-fee);
-
-document.getElementById("result").innerHTML =
-"<strong>Monthly:</strong> £" + net.toFixed(2) +
-"<br><strong>Yearly:</strong> £" + (net*12).toFixed(2);
-
-}
-</script>
-
+    // Run once on load
+    calculate();
+  </script>
 </body>
-
 </html>
