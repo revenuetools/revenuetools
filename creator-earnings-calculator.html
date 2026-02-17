@@ -1,72 +1,157 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Creator Earnings Calculator — Estimate Subscription Income | CalcStack</title>
 
-<title>Creator Earnings Calculator — Estimate Subscription Income | CalcStack</title>
+  <meta name="description" content="Free creator earnings calculator. Estimate monthly and yearly income from subscriptions, tips, and extra sales. Works for Patreon, OnlyFans, YouTube memberships, and more.">
 
-<meta name="description" content="Free creator earnings calculator. Estimate monthly and yearly income from subscriptions, tips, and extra sales. Works for Patreon, OnlyFans, YouTube memberships, and more.">
-
-<link rel="canonical" href="https://calcstack.tools/creator-earnings-calculator">
-<link rel="stylesheet" href="/css/styles.css">
-
+  <link rel="canonical" href="https://calcstack.tools/creator-earnings-calculator">
+  <link rel="stylesheet" href="/css/styles.css">
 </head>
 
-<body>
+<body class="page">
+  <div class="container">
+    <div class="titleRow">
+      <a class="backlink" href="/" aria-label="Back to CalcStack home">
+        ← Back to CalcStack
+      </a>
 
-<h1>Creator Earnings Calculator</h1>
+      <div>
+        <h1>Creator Earnings Calculator</h1>
+        <p class="subtitle">Estimate your subscription-based income quickly and easily.</p>
+      </div>
+    </div>
 
-<p>
-Estimate your subscription-based income quickly and easily.
-</p>
+    <div class="panel">
+      <div class="row">
+        <div>
+          <label for="subs">Subscribers</label>
+          <input id="subs" type="number" inputmode="numeric" min="0" value="100" placeholder="e.g. 100">
+        </div>
 
-<label>Subscribers</label>
-<input id="subs" type="number" value="100">
+        <div>
+          <label for="price">Subscription price (£)</label>
+          <input id="price" type="number" inputmode="decimal" min="0" step="0.01" value="10" placeholder="e.g. 10">
+        </div>
+      </div>
 
-<label>Subscription price (£)</label>
-<input id="price" type="number" value="10">
+      <div class="row">
+        <div>
+          <label for="extras">Extra sales per month (£)</label>
+          <input id="extras" type="number" inputmode="decimal" min="0" step="0.01" value="500" placeholder="e.g. 500">
+        </div>
 
-<label>Extra sales per month (£)</label>
-<input id="extras" type="number" value="500">
+        <div>
+          <label for="tips">Tips per month (£)</label>
+          <input id="tips" type="number" inputmode="decimal" min="0" step="0.01" value="200" placeholder="e.g. 200">
+        </div>
+      </div>
 
-<label>Tips per month (£)</label>
-<input id="tips" type="number" value="200">
+      <div class="row">
+        <div>
+          <label for="fee">Platform fee (%)</label>
+          <input id="fee" type="number" inputmode="decimal" min="0" step="0.1" value="20" placeholder="e.g. 20">
+        </div>
 
-<label>Platform fee (%)</label>
-<input id="fee" type="number" value="20">
+        <div>
+          <label>&nbsp;</label>
+          <div class="actions" style="justify-content:flex-start;margin-top:0;">
+            <button id="calcBtn" type="button">Calculate</button>
+            <button id="resetBtn" type="button" class="secondary">Reset</button>
+          </div>
+        </div>
+      </div>
 
-<button onclick="calc()">Calculate</button>
+      <div id="results" class="results hidden" aria-live="polite">
+        <div class="kpi">
+          <div class="kpiBox">
+            <div class="label">Estimated net monthly</div>
+            <div id="monthlyOut" class="value">£0.00</div>
+          </div>
+          <div class="kpiBox">
+            <div class="label">Estimated net yearly</div>
+            <div id="yearlyOut" class="value">£0.00</div>
+          </div>
+        </div>
+        <div class="muted" id="noteOut"></div>
+      </div>
+    </div>
 
-<h2 id="result"></h2>
+    <div class="footer">
+      © <span id="yearNow"></span> CalcStack • <a href="/">Home</a>
+    </div>
+  </div>
 
-<script>
+  <script>
+    const $ = (id) => document.getElementById(id);
 
-function calc(){
+    const defaults = {
+      subs: 100,
+      price: 10,
+      extras: 500,
+      tips: 200,
+      fee: 20
+    };
 
-let subs = Number(document.getElementById("subs").value);
+    function toNumber(value) {
+      const n = Number(value);
+      return Number.isFinite(n) ? n : 0;
+    }
 
-let price = Number(document.getElementById("price").value);
+    function formatGBP(amount) {
+      return "£" + amount.toFixed(2);
+    }
 
-let extras = Number(document.getElementById("extras").value);
+    function calc() {
+      const subs   = Math.max(0, toNumber($("subs").value));
+      const price  = Math.max(0, toNumber($("price").value));
+      const extras = Math.max(0, toNumber($("extras").value));
+      const tips   = Math.max(0, toNumber($("tips").value));
+      const feePct = Math.max(0, toNumber($("fee").value));
+      const fee    = feePct / 100;
 
-let tips = Number(document.getElementById("tips").value);
+      const grossMonthly = (subs * price) + extras + tips;
+      const netMonthly = grossMonthly * (1 - fee);
+      const netYearly = netMonthly * 12;
 
-let fee = Number(document.getElementById("fee").value)/100;
+      $("monthlyOut").textContent = formatGBP(netMonthly);
+      $("yearlyOut").textContent = formatGBP(netYearly);
 
-let gross = subs*price + extras + tips;
+      $("noteOut").textContent =
+        `Gross monthly: ${formatGBP(grossMonthly)} • Fee: ${feePct.toFixed(1)}%`;
 
-let net = gross*(1-fee);
+      $("results").classList.remove("hidden");
+    }
 
-document.getElementById("result").innerText =
-"Monthly: £" + net.toFixed(2) +
-" | Yearly: £" + (net*12).toFixed(2);
+    function resetForm() {
+      $("subs").value = defaults.subs;
+      $("price").value = defaults.price;
+      $("extras").value = defaults.extras;
+      $("tips").value = defaults.tips;
+      $("fee").value = defaults.fee;
+      $("results").classList.add("hidden");
+    }
 
-}
+    // Button handlers
+    $("calcBtn").addEventListener("click", calc);
+    $("resetBtn").addEventListener("click", resetForm);
 
-</script>
+    // Live update as user types (nice UX)
+    ["subs", "price", "extras", "tips", "fee"].forEach(id => {
+      $(id).addEventListener("input", () => {
+        // Only show results after first calculation
+        if (!$("results").classList.contains("hidden")) calc();
+      });
+    });
 
+    // Footer year
+    $("yearNow").textContent = new Date().getFullYear();
+
+    // Optional: compute once on load so it looks “alive”
+    calc();
+  </script>
 </body>
-
 </html>
