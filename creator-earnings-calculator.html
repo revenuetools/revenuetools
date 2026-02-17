@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Creator Earnings Calculator — Estimate Subscription Income | CalcStack</title>
+
+<meta name="description" content="Free creator earnings calculator. Estimate monthly and yearly income from subscriptions, tips, and extra sales. Works for Patreon, OnlyFans, YouTube memberships, and more.">
+
+<link rel="canonical" href="https://calcstack.tools/creator-earnings-calculator">
+
+</head>
+
+<body>
+
+<h1>Creator Earnings Calculator</h1>
+
+<p>
+Estimate your subscription-based income quickly and easily.
+</p>
+
+<label>Subscribers</label>
+<input id="subs" type="number" value="100">
+
+<label>Subscription price (£)</label>
+<input id="price" type="number" value="10">
+
+<label>Extra sales per month (£)</label>
+<input id="extras" type="number" value="500">
+
+<label>Tips per month (£)</label>
+<input id="tips" type="number" value="200">
+
+<label>Platform fee (%)</label>
+<input id="fee" type="number" value="20">
+
+<button onclick="calc()">Calculate</button>
+
+<h2 id="result"></h2>
+
+<script>
+
+function calc(){
+
+let subs = Number(document.getElementById("subs").value);
+
+let price = Number(document.getElementById("price").value);
+
+let extras = Number(document.getElementById("extras").value);
+
+let tips = Number(document.getElementById("tips").value);
+
+let fee = Number(document.getElementById("fee").value)/100;
+
+let gross = subs*price + extras + tips;
+
+let net = gross*(1-fee);
+
+document.getElementById("result").innerText =
+"Monthly: £" + net.toFixed(2) +
+" | Yearly: £" + (net*12).toFixed(2);
+
+}
+
+</script>
+
+</body>
+
+</html>
