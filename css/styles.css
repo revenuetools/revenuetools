@@ -287,3 +287,32 @@ a{color:var(--accent);text-decoration:none}
 a:hover{text-decoration:underline}
 
 .hidden{display:none}
+
+/* --- CalcStack refinements (safe, global polish) --- */
+.card{
+  backdrop-filter: blur(6px);
+}
+
+input{
+  height: 44px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(0,0,0,0.05)), var(--card2);
+}
+
+button{
+  min-height: 44px;
+  letter-spacing: 0.2px;
+}
+
+.kpiBox .value{
+  font-size: 24px;
+  letter-spacing: -0.3px;
+}
+
+.results{
+  background: rgba(255,255,255,0.02);
+}
+
+/* Slightly better spacing on very wide screens */
+@media (min-width: 1100px){
+  .container{ max-width: 1040px; }
+}
