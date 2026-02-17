@@ -85,7 +85,7 @@
           </div>
           <div>
             <label for="expenses">
-              Monthly expenses (£) <span class="hint">(optional)</span>
+              Monthly expenses (£) <span class="hint">optional</span>
             </label>
             <input id="expenses" type="number" inputmode="decimal" min="0" step="0.01" placeholder="e.g. 150" value="0">
           </div>
@@ -109,7 +109,7 @@
               <div class="muted">Monthly × 12</div>
             </div>
           </div>
-          <div class="muted" id="breakdown" style="margin-top:10px;"></div>
+          <div class="muted breakdown" id="breakdown"></div>
         </div>
 
         <p class="fineprint">
@@ -173,6 +173,13 @@
 
     document.getElementById("calcBtn").addEventListener("click", calculate);
     document.getElementById("resetBtn").addEventListener("click", resetAll);
+
+    // Enter key runs calculate in any field
+    ["subs","price","extras","tips","fee","expenses"].forEach(id => {
+      document.getElementById(id).addEventListener("keydown", (e) => {
+        if (e.key === "Enter") calculate();
+      });
+    });
 
     // simple placeholders for now
     document.getElementById("privacyLink").addEventListener("click", (e) => {
