@@ -13,12 +13,14 @@
 
 <body>
   <div class="container">
-    <h1 style="margin-bottom:8px;">Creator Earnings Calculator</h1>
-    <p class="subtitle" style="max-width:720px;margin:0 auto 18px;">
-      Estimate monthly and yearly earnings from subscriptions, tips, and extra sales.
-    </p>
+    <div class="pageHead">
+      <h1 style="margin-bottom:8px;">Creator Earnings Calculator</h1>
+      <p class="subtitle" style="max-width:720px;margin:0 auto 18px;">
+        Estimate monthly and yearly earnings from subscriptions, tips, and extra sales.
+      </p>
+    </div>
 
-    <div class="card" style="max-width:920px;margin:0 auto;">
+    <div class="card toolPageCard">
       <div class="row">
         <div>
           <label for="subs">Subscribers</label>
@@ -47,15 +49,15 @@
           <input id="fee" type="number" inputmode="decimal" min="0" max="100" step="0.1" value="20">
         </div>
         <div>
-          <label for="expenses">Monthly expenses (£) <span style="color:var(--muted2);font-size:12px;">optional</span></label>
+          <label for="expenses">Monthly expenses (£) <span class="hint">optional</span></label>
           <input id="expenses" type="number" inputmode="decimal" min="0" step="0.01" value="0" placeholder="e.g. 150">
         </div>
       </div>
 
-      <div class="actions" style="align-items:center;">
+      <div class="actions actionsTight">
         <button id="calcBtn" type="button">Calculate</button>
         <button class="secondary" id="resetBtn" type="button">Reset</button>
-        <a href="/" style="margin-left:6px;">Back to all tools</a>
+        <a class="inlineLink" href="/">Back to all tools</a>
       </div>
 
       <div class="results" id="results" style="margin-top:16px;">
@@ -72,10 +74,10 @@
           </div>
         </div>
 
-        <div class="muted" id="breakdown" style="margin-top:10px;"></div>
+        <div class="muted breakdown" id="breakdown"></div>
       </div>
 
-      <div class="muted" style="margin-top:12px;font-size:12px;line-height:1.4;">
+      <div class="muted note">
         Note: This is an estimate. Taxes vary by country and are not included.
       </div>
     </div>
