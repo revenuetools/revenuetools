@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Discount Calculator — Sale Price & Savings | CalcStack</title>
+  <meta name="description" content="Free discount calculator. Calculate sale price, savings, and final price after a discount percentage. Perfect for shopping, pricing, and promotions.">
+
+  <link rel="canonical" href="https://calcstack.tools/discount-calculator">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+
+<body class="page">
+  <div class="container">
+
+    <h1 style="margin-bottom:8px;">Discount Calculator</h1>
+
+    <p class="subtitle" style="max-width:760px;margin:0 auto 18px;">
+      Calculate sale price, savings, and final price after a discount.
+    </p>
+
+    <div class="card" style="max-width:920px;margin:0 auto;">
+
+      <div class="row">
+        <div>
+          <label for="original">Original price (£)</label>
+          <input id="original" type="number" inputmode="decimal" min="0" step="0.01" value="100">
+        </div>
+
+        <div>
+          <label for="discount">Discount (%)</label>
+          <input id="discount" type="number" inputmode="decimal" min="0" max="100" step="0.1" value="20">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="extraOff">Extra amount off (£) <span class="hint">optional</span></label>
+          <input id="extraOff" type="number" inputmode="decimal" min="0" step="0.01" value="0" placeholder="e.g. 5">
+        </div>
+
+        <div>
+          <label for="tax">Tax / VAT (%) <span class="hint">optional</span></label>
+          <input id="tax" type="number" inputmode="decimal" min="0" max="100" step="0.1" value="0" placeholder="e.g. 20">
+        </div>
+      </div>
+
+      <div class="actions" style="align-items:center;">
+        <button id="calcBtn" type="button">Calculate</button>
+        <button class="secondary" id="resetBtn" type="button">Reset</button>
+        <a href="/" style="margin-left:6px;">Back to all tools</a>
+      </div>
+
+      <div class="results" style="margin-top:16px;">
+        <div class="kpi">
+
+          <div class="kpiBox">
+            <div class="label">You save</div>
+            <div class="value" id="saveOut">—</div>
+            <div class="muted">Discount + extra off</div>
+          </div>
+
+          <div class="kpiBox">
+            <div class="label">Final price</div>
+            <div class="value" id="finalOut">—</div>
+            <div class="muted">After discount (and tax if set)</div>
+          </div>
+
+          <div class="kpiBox">
+            <div class="label">Sale price (before tax)</div>
+            <div class="value" id="saleOut">—</div>
+            <div class="muted">Discounted price</div>
+          </div>
+
+          <div class="kpiBox">
+            <div class="label">Effective discount</div>
+            <div class="value" id="effOut">—</div>
+            <div class="muted">Savings ÷ original</div>
+          </div>
+
+        </div>
+
+        <div class="muted breakdown" id="breakdown"></div>
+      </div>
+
+      <div class="muted" style="margin-top:12px;font-size:12px;line-height:1.4;">
+        Tip: Add VAT only if your original price is pre-tax and you want the final checkout estimate.
+      </div>
+
+    </div>
+
+    <div class="footer">© <span id="yearNow"></span> CalcStack.tools</div>
+
+  </div>
+
+<script>
+  const moneyGBP = (n) => {
+    const v = Number.isFinite(n) ? n : 0;
+    return new Intl.NumberFormat(undefined, { style: "currency", currency: "GBP" }).format(v);
+  };
+
+  const pct = (n) => (Number.isFinite(n) ? n : 0).toFixed(2) + "%";
+
+  const getVal = (id) => {
+    const v = parseFloat(document.getElementById(id).value);
+    return Number.isFinite(v) ? v : 0;
+  };
+
+  function calculate(){
+    const original = Math.max(0, getVal("original"));
+    const discPct = Math.min(100, Math.max(0, getVal("discount"))) / 100;
+    const extraOff = Math.max(0, getVal("extraOff"));
+    const taxPct = Math.min(100, Math.max(0, getVal("tax"))) / 100;
+
+    const discAmount = original * discPct;
+
+    let saleBeforeTax = original - discAmount - extraOff;
+    if (saleBeforeTax < 0) saleBeforeTax = 0;
+
+    const taxAmount = saleBeforeTax * taxPct;
+    const final = saleBeforeTax + taxAmount;
+
+    const savings = original - saleBeforeTax;
+    const effective = original > 0 ? (savings / original) * 100 : 0;
+
+    document.getElementById("saleOut").textContent = moneyGBP(saleBeforeTax);
+    document.getElementById("finalOut").textContent = moneyGBP(final);
+    document.getElementById("saveOut").textContent = moneyGBP(savings);
+    document.getElementById("effOut").textContent = pct(effective);
+
+    document.getElementById("breakdown").textContent =
+      `Original: ${moneyGBP(original)} · Discount: ${pct(discPct*100)} (${moneyGBP(discAmount)}) · ` +
+      `Extra off: ${moneyGBP(extraOff)} · Sale (pre-tax): ${moneyGBP(saleBeforeTax)} · ` +
+      `Tax: ${pct(taxPct*100)} (${moneyGBP(taxAmount)}) · Final: ${moneyGBP(final)} · Savings: ${moneyGBP(savings)}`;
+  }
+
+  function resetAll(){
+    document.getElementById("original").value = 100;
+    document.getElementById("discount").value = 20;
+    document.getElementById("extraOff").value = 0;
+    document.getElementById("tax").value = 0;
+    calculate();
+  }
+
+  document.getElementById("calcBtn").addEventListener("click", calculate);
+  document.getElementById("resetBtn").addEventListener("click", resetAll);
+
+  ["original","discount","extraOff","tax"].forEach(id => {
+    document.getElementById(id).addEventListener("input", calculate);
+    document.getElementById(id).addEventListener("keydown", (e) => {
+      if(e.key === "Enter") calculate();
+    });
+  });
+
+  document.getElementById("yearNow").textContent = new Date().getFullYear();
+  calculate();
+</script>
+
+</body>
+</html>
