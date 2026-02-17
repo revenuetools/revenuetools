@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>CPM Calculator — Cost Per Thousand Impressions | CalcStack</title>
+  <meta name="description" content="Free CPM calculator. Calculate cost per thousand impressions instantly. Used for advertising, YouTube, marketing, and ad revenue analysis.">
+
+  <link rel="canonical" href="https://calcstack.tools/cpm-calculator">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+
+<body class="page">
+  <div class="container">
+
+    <h1 style="margin-bottom:8px;">CPM Calculator</h1>
+
+    <p class="subtitle" style="max-width:720px;margin:0 auto 18px;">
+      Calculate cost per thousand impressions (CPM) quickly and accurately.
+    </p>
+
+    <div class="card" style="max-width:920px;margin:0 auto;">
+
+      <div class="row">
+
+        <div>
+          <label for="cost">Total cost (£)</label>
+          <input id="cost" type="number" inputmode="decimal" min="0" step="0.01" value="100">
+        </div>
+
+        <div>
+          <label for="impressions">Total impressions</label>
+          <input id="impressions" type="number" inputmode="numeric" min="0" step="1" value="50000">
+        </div>
+
+      </div>
+
+      <div class="actions" style="align-items:center;">
+        <button id="calcBtn" type="button">Calculate CPM</button>
+        <button class="secondary" id="resetBtn" type="button">Reset</button>
+        <a href="/" style="margin-left:6px;">Back to all tools</a>
+      </div>
+
+      <div class="results" style="margin-top:16px;">
+
+        <div class="kpi">
+
+          <div class="kpiBox">
+            <div class="label">CPM</div>
+            <div class="value" id="cpmOut">—</div>
+            <div class="muted">Cost per 1,000 impressions</div>
+          </div>
+
+        </div>
+
+        <div class="muted" id="breakdown" style="margin-top:10px;"></div>
+
+      </div>
+
+      <div class="muted" style="margin-top:12px;font-size:12px;">
+        Formula: CPM = (Cost ÷ Impressions) × 1,000
+      </div>
+
+    </div>
+
+    <div class="footer">© <span id="yearNow"></span> CalcStack.tools</div>
+
+  </div>
+
+<script>
+
+const moneyGBP = (n) => {
+  const v = Number.isFinite(n) ? n : 0;
+  return new Intl.NumberFormat(undefined, {
+    style: "currency",
+    currency: "GBP"
+  }).format(v);
+};
+
+const getVal = (id) => {
+  const v = parseFloat(document.getElementById(id).value);
+  return Number.isFinite(v) ? v : 0;
+};
+
+function calculate(){
+
+  const cost = Math.max(0, getVal("cost"));
+  const impressions = Math.max(0, getVal("impressions"));
+
+  let cpm = 0;
+
+  if(impressions > 0){
+    cpm = (cost / impressions) * 1000;
+  }
+
+  document.getElementById("cpmOut").textContent = moneyGBP(cpm);
+
+  document.getElementById("breakdown").textContent =
+    `Cost: ${moneyGBP(cost)} · Impressions: ${impressions.toLocaleString()} · CPM: ${moneyGBP(cpm)}`;
+
+}
+
+function resetAll(){
+
+  document.getElementById("cost").value = 100;
+  document.getElementById("impressions").value = 50000;
+
+  calculate();
+
+}
+
+document.getElementById("calcBtn").addEventListener("click", calculate);
+document.getElementById("resetBtn").addEventListener("click", resetAll);
+
+["cost","impressions"].forEach(id => {
+
+  document.getElementById(id).addEventListener("input", calculate);
+
+  document.getElementById(id).addEventListener("keydown", (e) => {
+
+    if(e.key === "Enter") calculate();
+
+  });
+
+});
+
+document.getElementById("yearNow").textContent = new Date().getFullYear();
+
+calculate();
+
+</script>
+
+</body>
+</html>
