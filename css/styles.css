@@ -29,6 +29,11 @@ body{
   text-align:center;
 }
 
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+
+.hidden{display:none}
+
 /* shared layout */
 .container{
   max-width:980px;
@@ -36,18 +41,16 @@ body{
   padding:48px 20px 70px;
 }
 
-/* tool page wrapper (use on calculator pages) */
+/* optional tool page wrapper */
 .page{
   min-height:100svh;
   display:flex;
   align-items:flex-start;
   justify-content:center;
 }
+.page .container{width:100%}
 
-.page .container{
-  width:100%;
-}
-
+/* typography */
 h1{
   font-size:44px;
   letter-spacing:-0.02em;
@@ -71,6 +74,12 @@ h1{
   box-shadow: var(--shadow);
 }
 
+/* glass polish (safe fallback) */
+.card{ backdrop-filter: blur(6px); }
+@supports not ((backdrop-filter: blur(6px))){
+  .card{ background: rgba(30,41,59,0.70); }
+}
+
 /* homepage grid */
 .grid{
   display:grid;
@@ -78,7 +87,6 @@ h1{
   gap:18px;
   margin-top:20px;
 }
-
 @media (min-width: 900px){
   .grid{grid-template-columns: 1fr 1fr;}
 }
@@ -107,9 +115,7 @@ h1{
   transform: translateY(-1px);
 }
 
-.tool:active{
-  transform: translateY(0px);
-}
+.tool:active{ transform: translateY(0px); }
 
 .tool small{
   display:block;
@@ -117,6 +123,18 @@ h1{
   margin-top:4px;
 }
 
+/* NEW: disabled tool state (use instead of inline opacity/cursor) */
+.tool.disabled{
+  opacity:.55;
+  cursor:not-allowed;
+  transform:none !important;
+}
+.tool.disabled:hover{
+  background: rgba(255,255,255,0.03);
+  border-color: rgba(255,255,255,0.10);
+}
+
+/* badge */
 .badge{
   display:inline-block;
   font-size:12px;
@@ -157,6 +175,34 @@ h1{
   text-decoration:none;
 }
 
+/* NEW: shared tool-page sizing + header spacing (no inline styles needed) */
+.pageHead{
+  max-width:920px;
+  margin:0 auto 18px;
+}
+.toolPageCard{
+  max-width:920px;
+  margin:0 auto;
+}
+.hint{
+  color:var(--muted2);
+  font-size:12px;
+  margin-left:6px;
+}
+.inlineLink{
+  margin-left:6px;
+}
+.breakdown{
+  margin-top:10px;
+  font-size:13px;
+  line-height:1.5;
+}
+.note{
+  margin-top:12px;
+  font-size:12px;
+  line-height:1.4;
+}
+
 /* forms */
 .row{
   display:grid;
@@ -164,7 +210,6 @@ h1{
   gap:12px;
   margin-top:12px;
 }
-
 @media (min-width: 640px){
   .row{grid-template-columns: 1fr 1fr;}
 }
@@ -181,14 +226,19 @@ input{
   padding:12px 12px;
   border-radius:var(--radius-sm);
   border:1px solid rgba(255,255,255,0.14);
-  background: rgba(17,24,39,0.85);
+  background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(0,0,0,0.05)), var(--card2);
   color:var(--text);
   outline:none;
+  height:44px;
 }
 
+/* better focus (keyboard users) */
 input:focus{
   border-color: rgba(56,189,248,0.7);
   box-shadow: 0 0 0 3px rgba(56,189,248,0.18);
+}
+input:focus-visible{
+  outline: none;
 }
 
 /* actions */
@@ -200,6 +250,7 @@ input:focus{
   flex-wrap:wrap;
   margin-top:16px;
 }
+.actionsTight{ align-items:center; }
 
 button{
   padding:12px 16px;
@@ -210,6 +261,8 @@ button{
   cursor:pointer;
   transition:0.18s ease;
   font-weight:700;
+  min-height:44px;
+  letter-spacing:0.2px;
 }
 
 button:hover{
@@ -217,14 +270,11 @@ button:hover{
   border-color: rgba(56,189,248,0.35);
 }
 
-button:active{
-  transform: translateY(1px);
-}
+button:active{ transform: translateY(1px); }
 
 .secondary{
   background: rgba(255,255,255,0.06);
 }
-
 .secondary:hover{
   background: rgba(255,255,255,0.10);
   border-color: rgba(255,255,255,0.22);
@@ -236,7 +286,7 @@ button:active{
   padding:14px;
   border-radius:12px;
   border:1px dashed rgba(255,255,255,0.18);
-  background: rgba(255,255,255,0.03);
+  background: rgba(255,255,255,0.02);
   color:var(--text);
 }
 
@@ -252,7 +302,6 @@ button:active{
   gap:10px;
   margin-top:10px;
 }
-
 @media (min-width: 640px){
   .kpi{grid-template-columns: 1fr 1fr;}
 }
@@ -270,9 +319,10 @@ button:active{
 }
 
 .kpiBox .value{
-  font-size:22px;
+  font-size:24px;
   font-weight:800;
   margin-top:4px;
+  letter-spacing:-0.3px;
 }
 
 /* footer */
@@ -283,36 +333,13 @@ button:active{
   text-align:center;
 }
 
-a{color:var(--accent);text-decoration:none}
-a:hover{text-decoration:underline}
-
-.hidden{display:none}
-
-/* --- CalcStack refinements (safe, global polish) --- */
-.card{
-  backdrop-filter: blur(6px);
-}
-
-input{
-  height: 44px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(0,0,0,0.05)), var(--card2);
-}
-
-button{
-  min-height: 44px;
-  letter-spacing: 0.2px;
-}
-
-.kpiBox .value{
-  font-size: 24px;
-  letter-spacing: -0.3px;
-}
-
-.results{
-  background: rgba(255,255,255,0.02);
-}
-
 /* Slightly better spacing on very wide screens */
 @media (min-width: 1100px){
   .container{ max-width: 1040px; }
+}
+
+/* reduce motion preference */
+@media (prefers-reduced-motion: reduce){
+  .tool, button{ transition:none; }
+  .tool:hover{ transform:none; }
 }
