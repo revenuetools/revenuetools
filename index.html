@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RevenueTools — Subscription Revenue Calculator</title>
+
+<style>
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #f7f9fc;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 600px;
+    margin: 60px auto;
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+h1 {
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    color: #666;
+    margin-bottom: 25px;
+}
+
+label {
+    display: block;
+    margin-top: 15px;
+    font-weight: 600;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    margin-top: 6px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 16px;
+}
+
+button {
+    margin-top: 20px;
+    width: 100%;
+    padding: 14px;
+    background: #635bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #5146e5;
+}
+
+.results {
+    margin-top: 30px;
+    padding: 20px;
+    background: #f3f5ff;
+    border-radius: 8px;
+}
+
+.result-item {
+    margin: 10px 0;
+    font-size: 18px;
+}
+
+.value {
+    font-weight: bold;
+    color: #635bff;
+}
+
+.footer {
+    margin-top: 20px;
+    font-size: 13px;
+    color: #888;
+    text-align: center;
+}
+
+</style>
+
+</head>
+<body>
+
+<div class="container">
+
+<h1>Subscription Revenue Calculator</h1>
+<div class="subtitle">
+Estimate your monthly and yearly subscription revenue.
+</div>
+
+<label>Subscription price (£)</label>
+<input type="number" id="price" placeholder="10">
+
+<label>Number of subscribers</label>
+<input type="number" id="subs" placeholder="100">
+
+<label>Platform fee (%)</label>
+<input type="number" id="fee" placeholder="20">
+
+<button onclick="calculate()">Calculate Revenue</button>
+
+<div class="results" id="results" style="display:none;">
+
+<div class="result-item">
+Monthly gross: <span class="value" id="monthlyGross"></span>
+</div>
+
+<div class="result-item">
+Monthly net: <span class="value" id="monthlyNet"></span>
+</div>
+
+<div class="result-item">
+Yearly gross: <span class="value" id="yearlyGross"></span>
+</div>
+
+<div class="result-item">
+Yearly net: <span class="value" id="yearlyNet"></span>
+</div>
+
+</div>
+
+<div class="footer">
+RevenueTools.io — More tools coming soon
+</div>
+
+</div>
+
+<script>
+
+function calculate() {
+
+    const price = parseFloat(document.getElementById("price").value) || 0;
+    const subs = parseFloat(document.getElementById("subs").value) || 0;
+    const fee = parseFloat(document.getElementById("fee").value) || 0;
+
+    const monthlyGross = price * subs;
+    const monthlyNet = monthlyGross * (1 - fee/100);
+
+    const yearlyGross = monthlyGross * 12;
+    const yearlyNet = monthlyNet * 12;
+
+    document.getElementById("monthlyGross").innerText = "£" + monthlyGross.toFixed(2);
+    document.getElementById("monthlyNet").innerText = "£" + monthlyNet.toFixed(2);
+
+    document.getElementById("yearlyGross").innerText = "£" + yearlyGross.toFixed(2);
+    document.getElementById("yearlyNet").innerText = "£" + yearlyNet.toFixed(2);
+
+    document.getElementById("results").style.display = "block";
+
+}
+
+</script>
+
+</body>
+</html>
