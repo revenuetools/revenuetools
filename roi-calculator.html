@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>ROI Calculator — Return on Investment Calculator | CalcStack</title>
+  <meta name="description" content="Free ROI calculator. Calculate return on investment, profit, and percentage return instantly. Perfect for business, marketing, crypto, and investing.">
+
+  <link rel="canonical" href="https://calcstack.tools/roi-calculator">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+
+<body>
+  <div class="container">
+    <div class="pageHead">
+      <h1>ROI Calculator</h1>
+      <p class="subtitle">
+        Calculate profit, return on investment, and percentage return instantly.
+      </p>
+    </div>
+
+    <div class="card toolPageCard">
+
+      <div class="row">
+        <div>
+          <label for="investment">Initial investment (£)</label>
+          <input id="investment" type="number" inputmode="decimal" min="0" step="0.01" value="1000">
+        </div>
+
+        <div>
+          <label for="returnAmount">Final value (£)</label>
+          <input id="returnAmount" type="number" inputmode="decimal" min="0" step="0.01" value="1500">
+        </div>
+      </div>
+
+      <div class="actions actionsTight">
+        <button id="calcBtn" type="button">Calculate ROI</button>
+        <button class="secondary" id="resetBtn" type="button">Reset</button>
+        <a class="inlineLink" href="/">Back to all tools</a>
+      </div>
+
+      <div class="results">
+
+        <div class="kpi">
+          <div class="kpiBox">
+            <div class="label">Profit</div>
+            <div class="value" id="profit">—</div>
+            <div class="muted">Final value − investment</div>
+          </div>
+
+          <div class="kpiBox">
+            <div class="label">ROI Percentage</div>
+            <div class="value" id="roiPercent">—</div>
+            <div class="muted">Return on investment</div>
+          </div>
+        </div>
+
+        <div class="muted breakdown" id="breakdown"></div>
+
+      </div>
+
+      <div class="muted note">
+        ROI = (Profit ÷ Investment) × 100
+      </div>
+
+    </div>
+
+    <div class="footer">
+      © <span id="yearNow"></span> CalcStack.tools
+    </div>
+
+  </div>
+
+<script>
+
+const fmtGBP = (n) => {
+  return new Intl.NumberFormat(undefined, {
+    style: "currency",
+    currency: "GBP"
+  }).format(n);
+};
+
+const fmtPercent = (n) => {
+  return n.toFixed(2) + "%";
+};
+
+function getVal(id){
+  const v = parseFloat(document.getElementById(id).value);
+  return Number.isFinite(v) ? v : 0;
+}
+
+function calculate(){
+
+  const investment = Math.max(0, getVal("investment"));
+  const finalValue = Math.max(0, getVal("returnAmount"));
+
+  const profit = finalValue - investment;
+
+  let roi = 0;
+
+  if(investment > 0){
+    roi = (profit / investment) * 100;
+  }
+
+  document.getElementById("profit").textContent = fmtGBP(profit);
+  document.getElementById("roiPercent").textContent = fmtPercent(roi);
+
+  document.getElementById("breakdown").textContent =
+    `Investment: ${fmtGBP(investment)} · Final value: ${fmtGBP(finalValue)} · Profit: ${fmtGBP(profit)} · ROI: ${fmtPercent(roi)}`;
+
+}
+
+function resetAll(){
+
+  document.getElementById("investment").value = 1000;
+  document.getElementById("returnAmount").value = 1500;
+
+  calculate();
+
+}
+
+document.getElementById("calcBtn").addEventListener("click", calculate);
+document.getElementById("resetBtn").addEventListener("click", resetAll);
+
+["investment","returnAmount"].forEach(id => {
+  document.getElementById(id).addEventListener("input", calculate);
+  document.getElementById(id).addEventListener("keydown", e => {
+    if(e.key === "Enter") calculate();
+  });
+});
+
+document.getElementById("yearNow").textContent = new Date().getFullYear();
+
+calculate();
+
+</script>
+
+</body>
+</html>
