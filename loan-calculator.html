@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Loan Calculator — Monthly Payment & Total Interest | CalcStack</title>
+  <meta name="description" content="Free loan calculator. Calculate monthly payments, total interest, and total repayment from loan amount, interest rate, and term.">
+
+  <link rel="canonical" href="https://calcstack.tools/loan-calculator">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+
+<body class="page">
+  <div class="container">
+
+    <h1 style="margin-bottom:8px;">Loan Calculator</h1>
+
+    <p class="subtitle" style="max-width:760px;margin:0 auto 18px;">
+      Calculate monthly payment, total interest, and total repayment from loan amount, APR, and term.
+    </p>
+
+    <div class="card" style="max-width:920px;margin:0 auto;">
+
+      <div class="row">
+        <div>
+          <label for="amount">Loan amount (£)</label>
+          <input id="amount" type="number" inputmode="decimal" min="0" step="0.01" value="10000" placeholder="e.g. 25000">
+        </div>
+        <div>
+          <label for="apr">Interest rate (APR %)</label>
+          <input id="apr" type="number" inputmode="decimal" min="0" step="0.01" value="6.5" placeholder="e.g. 6.5">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="years">Loan term (years)</label>
+          <input id="years" type="number" inputmode="decimal" min="0" step="0.5" value="3" placeholder="e.g. 5">
+        </div>
+        <div>
+          <label for="extra">Extra payment per month (£) <span class="hint">optional</span></label>
+          <input id="extra" type="number" inputmode="decimal" min="0" step="0.01" value="0" placeholder="e.g. 50">
+        </div>
+      </div>
+
+      <div class="actions" style="align-items:center;">
+        <button id="calcBtn" type="button">Calculate</button>
+        <button class="secondary" id="resetBtn" type="button">Reset</button>
+        <a href="/" style="margin-left:6px;">Back to all tools</a>
+      </div>
+
+      <div class="results" style="margin-top:16px;">
+        <div class="kpi">
+
+          <div class="kpiBox">
+            <div class="label">Monthly payment</div>
+            <div class="value" id="paymentOut">—</div>
+            <div class="muted">Estimated minimum payment</div>
+          </div>
+
+          <div class="kpiBox">
+            <div class="label">Total interest</div>
+            <div class="value" id="interestOut">—</div>
+            <div class="muted">Over full term</div>
+          </div>
+
+          <div class="kpiBox">
+            <div class="label">Total repaid</div>
+            <div class="value" id="totalOut">—</div>
+            <div class="muted">Principal + interest</div>
+          </div>
+
+          <div class="kpiBox">
+            <div class="label">Payoff time (with extra)</div>
+            <div class="value" id="payoffOut">—</div>
+            <div class="muted">If extra payment is set</div>
+          </div>
+
+        </div>
+
+        <div class="muted" id="breakdown" style="margin-top:10px;"></div>
+      </div>
+
+      <div class="muted" style="margin-top:12px;font-size:12px;line-height:1.4;">
+        Note: This is an estimate. Real loans can include fees, compounding differences, and payment schedules.
+      </div>
+
+    </div>
+
+    <div class="footer">© <span id="yearNow"></span> CalcStack.tools</div>
+
+  </div>
+
+<script>
+  const moneyGBP = (n) => {
+    const v = Number.isFinite(n) ? n : 0;
+    return new Intl.NumberFormat(undefined, { style: "currency", currency: "GBP" }).format(v);
+  };
+
+  const getVal = (id) => {
+    const v = parseFloat(document.getElementById(id).value);
+    return Number.isFinite(v) ? v : 0;
+  };
+
+  // Standard amortization monthly payment
+  function monthlyPayment(P, annualRatePct, years){
+    const n = Math.max(0, Math.round(years * 12));
+    const r = Math.max(0, annualRatePct) / 100 / 12;
+
+    if (n === 0) return 0;
+    if (r === 0) return P / n;
+
+    return P * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+  }
+
+  // Simulate payoff time with extra payments (simple month-by-month)
+  function payoffWithExtra(P, annualRatePct, basePayment, extra){
+    const r = Math.max(0, annualRatePct) / 100 / 12;
+    const pay = Math.max(0, basePayment + extra);
+
+    if (P <= 0) return { months: 0, totalInterest: 0, totalPaid: 0 };
+    if (pay <= 0) return { months: Infinity, totalInterest: Infinity, totalPaid: Infinity };
+
+    let balance = P;
+    let months = 0;
+    let totalInterest = 0;
+    let totalPaid = 0;
+
+    // safety cap (100 years)
+    const cap = 1200;
+
+    while (balance > 0.005 && months < cap){
+      const interest = balance * r;
+      totalInterest += interest;
+
+      let principalPaid = pay - interest;
+      if (principalPaid <= 0){
+        // payment doesn't even cover interest
+        return { months: Infinity, totalInterest: Infinity, totalPaid: Infinity };
+      }
+
+      if (principalPaid > balance){
+        principalPaid = balance;
+      }
+
+      balance -= principalPaid;
+      totalPaid += (principalPaid + interest);
+      months++;
+    }
+
+    return { months, totalInterest, totalPaid };
+  }
+
+  function formatMonths(m){
+    if (!Number.isFinite(m)) return "—";
+    const years = Math.floor(m / 12);
+    const months = m % 12;
+    if (years === 0) return `${months} months`;
+    if (months === 0) return `${years} years`;
+    return `${years}y ${months}m`;
+  }
+
+  function calculate(){
+    const amount = Math.max(0, getVal("amount"));
+    const apr = Math.max(0, getVal("apr"));
+    const years = Math.max(0, getVal("years"));
+    const extra = Math.max(0, getVal("extra"));
+
+    const n = Math.max(0, Math.round(years * 12));
+    const base = monthlyPayment(amount, apr, years);
+
+    // totals without extra
+    const totalPaid = base * n;
+    const totalInterest = totalPaid - amount;
+
+    document.getElementById("paymentOut").textContent = moneyGBP(base);
+    document.getElementById("interestOut").textContent = moneyGBP(totalInterest);
+    document.getElementById("totalOut").textContent = moneyGBP(totalPaid);
+
+    // payoff with extra
+    if (extra > 0){
+      const sim = payoffWithExtra(amount, apr, base, extra);
+      document.getElementById("payoffOut").textContent = formatMonths(sim.months);
+    } else {
+      document.getElementById("payoffOut").textContent = formatMonths(n);
+    }
+
+    document.getElementById("breakdown").textContent =
+      `Loan: ${moneyGBP(amount)} · APR: ${apr.toFixed(2)}% · Term: ${n.toLocaleString()} months · ` +
+      `Monthly: ${moneyGBP(base)} · Extra: ${moneyGBP(extra)} / mo`;
+  }
+
+  function resetAll(){
+    document.getElementById("amount").value = 10000;
+    document.getElementById("apr").value = 6.5;
+    document.getElementById("years").value = 3;
+    document.getElementById("extra").value = 0;
+    calculate();
+  }
+
+  document.getElementById("calcBtn").addEventListener("click", calculate);
+  document.getElementById("resetBtn").addEventListener("click", resetAll);
+
+  ["amount","apr","years","extra"].forEach(id => {
+    document.getElementById(id).addEventListener("input", calculate);
+    document.getElementById(id).addEventListener("keydown", (e) => {
+      if(e.key === "Enter") calculate();
+    });
+  });
+
+  document.getElementById("yearNow").textContent = new Date().getFullYear();
+  calculate();
+</script>
+
+</body>
+</html>
