@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Twitch Earnings Calculator — Subs, Bits, Ads & Donations | CalcStack</title>
+  <meta name="description" content="Free Twitch earnings calculator. Estimate monthly and yearly income from subscriptions, bits, ads (CPM), donations, and other revenue. Includes fees and expenses.">
+
+  <link rel="canonical" href="https://calcstack.tools/twitch-earnings-calculator">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+
+<body class="page">
+  <div class="container">
+
+    <h1 style="margin-bottom:8px;">Twitch Earnings Calculator</h1>
+
+    <p class="subtitle" style="max-width:920px;margin:0 auto 18px;">
+      Estimate Twitch earnings from subs, bits, ads, and donations — after optional fees and expenses.
+    </p>
+
+    <div class="card" style="max-width:920px;margin:0 auto;">
+
+      <h2 style="margin:0 0 8px;">1) Subscriptions</h2>
+
+      <div class="row">
+        <div>
+          <label for="t1">Tier 1 subs (count)</label>
+          <input id="t1" type="number" inputmode="numeric" min="0" step="1" value="150">
+        </div>
+        <div>
+          <label for="t1net">Net per Tier 1 sub (£) <span class="hint">(after split)</span></label>
+          <input id="t1net" type="number" inputmode="decimal" min="0" step="0.01" value="2.00">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="t2">Tier 2 subs (count)</label>
+          <input id="t2" type="number" inputmode="numeric" min="0" step="1" value="10">
+        </div>
+        <div>
+          <label for="t2net">Net per Tier 2 sub (£)</label>
+          <input id="t2net" type="number" inputmode="decimal" min="0" step="0.01" value="4.00">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="t3">Tier 3 subs (count)</label>
+          <input id="t3" type="number" inputmode="numeric" min="0" step="1" value="2">
+        </div>
+        <div>
+          <label for="t3net">Net per Tier 3 sub (£)</label>
+          <input id="t3net" type="number" inputmode="decimal" min="0" step="0.01" value="10.00">
+        </div>
+      </div>
+
+      <hr style="border:0;border-top:1px solid rgba(255,255,255,0.10);margin:18px 0;">
+
+      <h2 style="margin:0 0 8px;">2) Bits, ads, donations</h2>
+
+      <div class="row">
+        <div>
+          <label for="bits">Bits (monthly)</label>
+          <input id="bits" type="number" inputmode="numeric" min="0" step="1" value="5000">
+          <div class="muted" style="font-size:12px;margin-top:6px;">
+            Approx: 100 bits ≈ £1 to the streamer (varies).
+          </div>
+        </div>
+
+        <div>
+          <label for="bitsPer100">Net per 100 bits (£)</label>
+          <input id="bitsPer100" type="number" inputmode="decimal" min="0" step="0.01" value="1.00">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="adImpressions">Ad impressions (monthly)</label>
+          <input id="adImpressions" type="number" inputmode="numeric" min="0" step="1" value="200000" placeholder="e.g. 500000">
+        </div>
+
+        <div>
+          <label for="adCpm">Ad CPM (£ per 1,000 impressions)</label>
+          <input id="adCpm" type="number" inputmode="decimal" min="0" step="0.01" value="2.50" placeholder="e.g. 3.00">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="donations">Donations (£ monthly)</label>
+          <input id="donations" type="number" inputmode="decimal" min="0" step="0.01" value="100">
+        </div>
+
+        <div>
+          <label for="other">Other income (£ monthly)</label>
+          <input id="other" type="number" inputmode="decimal" min="0" step="0.01" value="0">
+        </div>
+      </div>
+
+      <hr style="border:0;border-top:1px solid rgba(255,255,255,0.10);margin:18px 0;">
+
+      <h2 style="margin:0 0 8px;">3) Fees & expenses (optional)</h2>
+
+      <div class="row">
+        <div>
+          <label for="feesPct">Fees (%)</label>
+          <input id="feesPct" type="number" inputmode="decimal" min="0" max="100" step="0.1" value="0" placeholder="e.g. 5">
+        </div>
+
+        <div>
+          <label for="expenses">Monthly expenses (£)</label>
+          <input id="expenses" type="number" inputmode="decimal" min="0" step="0.01" value="0" placeholder="e.g. 150">
+        </div>
+      </div>
+
+      <div class="actions" style="align-items:center;">
+        <button id="calcBtn" type="button">Calculate</button>
+        <button class="secondary" id="resetBtn" type="button">Reset</button>
+        <a href="/" style="margin-left:6px;">Back to all tools</a>
+      </div>
+
+      <div class="results" style="margin-top:16px;">
+        <div class="kpi">
+
+          <div class="kpiBox">
+            <div class="label">Monthly (net)</div>
+            <div class="value" id="monthlyOut">—</div>
+            <div class="muted">After fees + expenses</div>
+          </div>
+
+          <div class="kpiBox">
+            <div class="label">Yearly (net)</div>
+            <div class="value" id="yearlyOut">—</div>
+            <div class="muted">Monthly × 12</div>
+          </div>
+
+          <div class="kpiBox">
+            <div class="label">Gross revenue</div>
+            <div class="value" id="grossOut">—</div>
+            <div class="muted">All sources combined</div>
+          </div>
+
+          <div class="kpiBox">
+            <div class="label">Fees</div>
+            <div class="value" id="feesOut">—</div>
+            <div class="muted">Gross × fees%</div>
+          </div>
+
+        </div>
+
+        <div class="muted" id="breakdown" style="margin-top:10px;"></div>
+      </div>
+
+      <div class="muted" style="margin-top:12px;font-size:12px;line-height:1.4;">
+        Note: Twitch payouts vary by region, revenue share, and program terms. This is an estimate.
+      </div>
+
+    </div>
+
+    <div class="footer">© <span id="yearNow"></span> CalcStack.tools</div>
+
+  </div>
+
+<script>
+  const moneyGBP = (n) => {
+    const v = Number.isFinite(n) ? n : 0;
+    return new Intl.NumberFormat(undefined, { style: "currency", currency: "GBP" }).format(v);
+  };
+
+  const getVal = (id) => {
+    const v = parseFloat(document.getElementById(id).value);
+    return Number.isFinite(v) ? v : 0;
+  };
+
+  function calcAds(impressions, cpm){
+    return (impressions / 1000) * cpm;
+  }
+
+  function calculate(){
+    const t1 = Math.max(0, getVal("t1"));
+    const t1net = Math.max(0, getVal("t1net"));
+    const t2 = Math.max(0, getVal("t2"));
+    const t2net = Math.max(0, getVal("t2net"));
+    const t3 = Math.max(0, getVal("t3"));
+    const t3net = Math.max(0, getVal("t3net"));
+
+    const bits = Math.max(0, getVal("bits"));
+    const bitsPer100 = Math.max(0, getVal("bitsPer100"));
+
+    const adImpressions = Math.max(0, getVal("adImpressions"));
+    const adCpm = Math.max(0, getVal("adCpm"));
+
+    const donations = Math.max(0, getVal("donations"));
+    const other = Math.max(0, getVal("other"));
+
+    const feesPct = Math.min(100, Math.max(0, getVal("feesPct")));
+    const expenses = Math.max(0, getVal("expenses"));
+
+    const subsGross = (t1 * t1net) + (t2 * t2net) + (t3 * t3net);
+    const bitsGross = (bits / 100) * bitsPer100;
+    const adsGross = calcAds(adImpressions, adCpm);
+
+    const gross = subsGross + bitsGross + adsGross + donations + other;
+
+    const fees = gross * (feesPct / 100);
+    const monthlyNet = Math.max(0, gross - fees - expenses);
+    const yearlyNet = monthlyNet * 12;
+
+    document.getElementById("monthlyOut").textContent = moneyGBP(monthlyNet);
+    document.getElementById("yearlyOut").textContent = moneyGBP(yearlyNet);
+    document.getElementById("grossOut").textContent = moneyGBP(gross);
+    document.getElementById("feesOut").textContent = moneyGBP(fees);
+
+    document.getElementById("breakdown").textContent =
+      `Subs: ${moneyGBP(subsGross)} · Bits: ${moneyGBP(bitsGross)} · Ads: ${moneyGBP(adsGross)} · ` +
+      `Donations: ${moneyGBP(donations)} · Other: ${moneyGBP(other)} · Fees: ${feesPct.toFixed(1)}% (${moneyGBP(fees)}) · ` +
+      `Expenses: ${moneyGBP(expenses)} · Net: ${moneyGBP(monthlyNet)}`;
+  }
+
+  function resetAll(){
+    document.getElementById("t1").value = 150;
+    document.getElementById("t1net").value = 2.00;
+    document.getElementById("t2").value = 10;
+    document.getElementById("t2net").value = 4.00;
+    document.getElementById("t3").value = 2;
+    document.getElementById("t3net").value = 10.00;
+
+    document.getElementById("bits").value = 5000;
+    document.getElementById("bitsPer100").value = 1.00;
+
+    document.getElementById("adImpressions").value = 200000;
+    document.getElementById("adCpm").value = 2.50;
+
+    document.getElementById("donations").value = 100;
+    document.getElementById("other").value = 0;
+
+    document.getElementById("feesPct").value = 0;
+    document.getElementById("expenses").value = 0;
+
+    calculate();
+  }
+
+  document.getElementById("calcBtn").addEventListener("click", calculate);
+  document.getElementById("resetBtn").addEventListener("click", resetAll);
+
+  [
+    "t1","t1net","t2","t2net","t3","t3net",
+    "bits","bitsPer100","adImpressions","adCpm",
+    "donations","other","feesPct","expenses"
+  ].forEach(id => {
+    document.getElementById(id).addEventListener("input", calculate);
+    document.getElementById(id).addEventListener("keydown", (e) => {
+      if(e.key === "Enter") calculate();
+    });
+  });
+
+  document.getElementById("yearNow").textContent = new Date().getFullYear();
+  calculate();
+</script>
+
+</body>
+</html>
