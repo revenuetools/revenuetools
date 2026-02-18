@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Markup Calculator — Markup %, Margin % & Selling Price | CalcStack</title>
+  <meta name="description" content="Free markup calculator. Calculate selling price from cost and markup %, plus profit and profit margin %. Perfect for pricing products and services.">
+
+  <link rel="canonical" href="https://calcstack.tools/markup-calculator">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+
+<body class="page">
+  <div class="container">
+
+    <h1 style="margin-bottom:8px;">Markup Calculator</h1>
+
+    <p class="subtitle" style="max-width:820px;margin:0 auto 18px;">
+      Calculate selling price from cost and markup %, plus profit and profit margin.
+    </p>
+
+    <div class="card" style="max-width:920px;margin:0 auto;">
+
+      <div class="row">
+        <div>
+          <label for="cost">Cost (£)</label>
+          <input id="cost" type="number" inputmode="decimal" min="0" step="0.01" value="20" placeholder="e.g. 12.50">
+        </div>
+
+        <div>
+          <label for="markup">Markup (%)</label>
+          <input id="markup" type="number" inputmode="decimal" min="0" step="0.01" value="50" placeholder="e.g. 40">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="fees">Fees per sale (£) <span class="hint">optional</span></label>
+          <input id="fees" type="number" inputmode="decimal" min="0" step="0.01" value="0" placeholder="e.g. 1.20">
+        </div>
+
+        <div>
+          <label for="shipping">Shipping/packaging (£) <span class="hint">optional</span></label>
+          <input id="shipping" type="number" inputmode="decimal" min="0" step="0.01" value="0" placeholder="e.g. 2.50">
+        </div>
+      </div>
+
+      <div class="actions" style="align-items:center;">
+        <button id="calcBtn" type="button">Calculate</button>
+        <button class="secondary" id="resetBtn" type="button">Reset</button>
+        <a href="/" style="margin-left:6px;">Back to all tools</a>
+      </div>
+
+      <div class="results" style="margin-top:16px;">
+        <div class="kpi">
+
+          <div class="kpiBox">
+            <div class="label">Selling price</div>
+            <div class="value" id="priceOut">—</div>
+            <div class="muted">Cost + markup + extras</div>
+          </div>
+
+          <div class="kpiBox">
+            <div class="label">Profit</div>
+            <div class="value" id="profitOut">—</div>
+            <div class="muted">Price − total cost</div>
+          </div>
+
+          <div class="kpiBox">
+            <div class="label">Margin</div>
+            <div class="value" id="marginOut">—</div>
+            <div class="muted">Profit ÷ price</div>
+          </div>
+
+          <div class="kpiBox">
+            <div class="label">Markup (effective)</div>
+            <div class="value" id="markupOut">—</div>
+            <div class="muted">Profit ÷ cost</div>
+          </div>
+
+        </div>
+
+        <div class="muted" id="breakdown" style="margin-top:10px;"></div>
+      </div>
+
+      <div class="muted" style="margin-top:12px;font-size:12px;line-height:1.4;">
+        Tip: Markup % is based on cost. Margin % is based on selling price. They’re not the same.
+      </div>
+
+    </div>
+
+    <div class="footer">© <span id="yearNow"></span> CalcStack.tools</div>
+
+  </div>
+
+<script>
+  const moneyGBP = (n) => {
+    const v = Number.isFinite(n) ? n : 0;
+    return new Intl.NumberFormat(undefined, { style: "currency", currency: "GBP" }).format(v);
+  };
+
+  const pct = (n) => (Number.isFinite(n) ? n : 0).toFixed(2) + "%";
+
+  const getVal = (id) => {
+    const v = parseFloat(document.getElementById(id).value);
+    return Number.isFinite(v) ? v : 0;
+  };
+
+  function calculate(){
+    const cost = Math.max(0, getVal("cost"));
+    const markupPct = Math.max(0, getVal("markup"));
+    const fees = Math.max(0, getVal("fees"));
+    const shipping = Math.max(0, getVal("shipping"));
+
+    const markupAmount = cost * (markupPct / 100);
+    const totalCost = cost + fees + shipping;
+    const price = cost + markupAmount + fees + shipping;
+
+    const profit = price - totalCost;
+
+    const margin = price > 0 ? (profit / price) * 100 : 0;
+    const effMarkup = cost > 0 ? (profit / cost) * 100 : 0;
+
+    document.getElementById("priceOut").textContent = moneyGBP(price);
+    document.getElementById("profitOut").textContent = moneyGBP(profit);
+    document.getElementById("marginOut").textContent = pct(margin);
+    document.getElementById("markupOut").textContent = pct(effMarkup);
+
+    document.getElementById("breakdown").textContent =
+      `Cost: ${moneyGBP(cost)} · Markup: ${markupPct.toFixed(2)}% (${moneyGBP(markupAmount)}) · ` +
+      `Fees: ${moneyGBP(fees)} · Shipping: ${moneyGBP(shipping)} · Price: ${moneyGBP(price)} · Profit: ${moneyGBP(profit)}`;
+  }
+
+  function resetAll(){
+    document.getElementById("cost").value = 20;
+    document.getElementById("markup").value = 50;
+    document.getElementById("fees").value = 0;
+    document.getElementById("shipping").value = 0;
+    calculate();
+  }
+
+  document.getElementById("calcBtn").addEventListener("click", calculate);
+  document.getElementById("resetBtn").addEventListener("click", resetAll);
+
+  ["cost","markup","fees","shipping"].forEach(id => {
+    document.getElementById(id).addEventListener("input", calculate);
+    document.getElementById(id).addEventListener("keydown", (e) => {
+      if(e.key === "Enter") calculate();
+    });
+  });
+
+  document.getElementById("yearNow").textContent = new Date().getFullYear();
+  calculate();
+</script>
+
+</body>
+</html>
