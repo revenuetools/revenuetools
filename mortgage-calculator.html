@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Mortgage Calculator — Monthly Payments & Interest | CalcStack</title>
+  <meta name="description" content="Free mortgage calculator. Estimate monthly mortgage payments, total interest, and total cost based on loan amount, interest rate, and term.">
+
+  <link rel="canonical" href="https://calcstack.tools/mortgage-calculator">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+
+<body class="page">
+  <div class="container">
+
+    <h1 style="margin-bottom:8px;">Mortgage Calculator</h1>
+
+    <p class="subtitle" style="max-width:860px;margin:0 auto 18px;">
+      Calculate your monthly mortgage payment, total interest, and full loan cost.
+    </p>
+
+    <div class="card" style="max-width:920px;margin:0 auto;">
+
+      <div class="row">
+
+        <div>
+          <label for="loan">Loan amount (£)</label>
+          <input id="loan" type="number" value="200000" min="0" step="0.01">
+        </div>
+
+        <div>
+          <label for="rate">Interest rate (% per year)</label>
+          <input id="rate" type="number" value="5" min="0" step="0.01">
+        </div>
+
+      </div>
+
+      <div class="row">
+
+        <div>
+          <label for="years">Loan term (years)</label>
+          <input id="years" type="number" value="25" min="0" step="1">
+        </div>
+
+      </div>
+
+      <div class="actions">
+
+        <button id="calcBtn">Calculate</button>
+        <button class="secondary" id="resetBtn">Reset</button>
+        <a href="/" style="margin-left:6px;">Back to all tools</a>
+
+      </div>
+
+      <div class="results">
+
+        <div class="kpi">
+
+          <div class="kpiBox">
+            <div class="label">Monthly payment</div>
+            <div class="value" id="monthlyOut">—</div>
+            <div class="muted">Required monthly payment</div>
+          </div>
+
+          <div class="kpiBox">
+            <div class="label">Total interest</div>
+            <div class="value" id="interestOut">—</div>
+            <div class="muted">Cost of borrowing</div>
+          </div>
+
+          <div class="kpiBox">
+            <div class="label">Total paid</div>
+            <div class="value" id="totalOut">—</div>
+            <div class="muted">Loan + interest</div>
+          </div>
+
+          <div class="kpiBox">
+            <div class="label">Loan term</div>
+            <div class="value" id="monthsOut">—</div>
+            <div class="muted">Total months</div>
+          </div>
+
+        </div>
+
+        <div class="muted" id="breakdown" style="margin-top:10px;"></div>
+
+      </div>
+
+      <div class="muted" style="margin-top:12px;font-size:12px;">
+        Mortgage estimates may vary depending on lender terms, fees, and insurance.
+      </div>
+
+      <!-- RELATED CALCULATORS -->
+      <hr style="border:0;border-top:1px solid rgba(255,255,255,0.10);margin:18px 0;">
+
+      <div class="muted" style="font-size:13px;line-height:1.6;">
+        Related calculators:
+        <a href="/loan-calculator">Loan Calculator</a> ·
+        <a href="/compound-interest-calculator">Compound Interest Calculator</a> ·
+        <a href="/salary-to-hourly-calculator">Salary Calculator</a> ·
+        <a href="/percentage-calculator">Percentage Calculator</a>
+      </div>
+
+    </div>
+
+    <div class="footer">
+      © <span id="yearNow"></span> CalcStack.tools
+    </div>
+
+  </div>
+
+<script>
+
+const money = n =>
+  new Intl.NumberFormat(undefined,{
+    style:"currency",
+    currency:"GBP"
+  }).format(n);
+
+const getVal = id =>
+  parseFloat(document.getElementById(id).value) || 0;
+
+function calculate(){
+
+  const P = getVal("loan");
+  const r = getVal("rate") / 100 / 12;
+  const n = getVal("years") * 12;
+
+  const monthly =
+    P * r * Math.pow(1+r, n) /
+    (Math.pow(1+r, n) - 1);
+
+  const total = monthly * n;
+  const interest = total - P;
+
+  monthlyOut.textContent = money(monthly);
+  totalOut.textContent = money(total);
+  interestOut.textContent = money(interest);
+  monthsOut.textContent = n.toLocaleString();
+
+  breakdown.textContent =
+    `Loan: ${money(P)} · Rate: ${(r*12*100).toFixed(2)}% · Term: ${n} months`;
+
+}
+
+function resetAll(){
+
+  loan.value = 200000;
+  rate.value = 5;
+  years.value = 25;
+
+  calculate();
+
+}
+
+calcBtn.onclick = calculate;
+resetBtn.onclick = resetAll;
+
+yearNow.textContent = new Date().getFullYear();
+
+calculate();
+
+</script>
+
+</body>
+</html>
