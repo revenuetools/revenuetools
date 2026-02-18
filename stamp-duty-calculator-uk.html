@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Stamp Duty Calculator (UK) — SDLT Property Tax | CalcStack</title>
+  <meta name="description" content="Free UK stamp duty calculator. Calculate SDLT on property purchases including additional property surcharge.">
+
+  <link rel="canonical" href="https://calcstack.tools/stamp-duty-calculator-uk">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+
+<body class="page">
+  <div class="container">
+
+    <h1 style="margin-bottom:8px;">Stamp Duty Calculator (UK)</h1>
+
+    <p class="subtitle" style="max-width:900px;margin:0 auto 18px;">
+      Calculate stamp duty land tax (SDLT) on residential property purchases in England and Northern Ireland.
+    </p>
+
+    <div class="card" style="max-width:920px;margin:0 auto;">
+
+      <div class="row">
+
+        <div>
+          <label for="price">Property price (£)</label>
+          <input id="price" type="number" value="300000" min="0" step="0.01">
+        </div>
+
+        <div>
+          <label for="extra">Additional property?</label>
+          <select id="extra">
+            <option value="no">No</option>
+            <option value="yes">Yes (3% surcharge)</option>
+          </select>
+        </div>
+
+      </div>
+
+      <div class="actions">
+        <button id="calcBtn">Calculate</button>
+        <button class="secondary" id="resetBtn">Reset</button>
+        <a href="/" style="margin-left:6px;">Back to all tools</a>
+      </div>
+
+      <div class="results">
+
+        <div class="kpi">
+
+          <div class="kpiBox">
+            <div class="label">Stamp duty</div>
+            <div class="value" id="dutyOut">—</div>
+            <div class="muted">Total SDLT</div>
+          </div>
+
+          <div class="kpiBox">
+            <div class="label">Effective rate</div>
+            <div class="value" id="rateOut">—</div>
+            <div class="muted">Tax ÷ price</div>
+          </div>
+
+          <div class="kpiBox">
+            <div class="label">Total cost</div>
+            <div class="value" id="totalOut">—</div>
+            <div class="muted">Property + tax</div>
+          </div>
+
+        </div>
+
+        <div class="muted" id="breakdown"></div>
+
+      </div>
+
+      <!-- RELATED CALCULATORS -->
+      <hr style="border:0;border-top:1px solid rgba(255,255,255,0.10);margin:18px 0;">
+
+      <div class="muted" style="font-size:13px;line-height:1.6;">
+        Related calculators:
+        <a href="/mortgage-calculator">Mortgage Calculator</a> ·
+        <a href="/income-tax-calculator-uk">Income Tax Calculator</a> ·
+        <a href="/loan-calculator">Loan Calculator</a> ·
+        <a href="/percentage-calculator">Percentage Calculator</a>
+      </div>
+
+    </div>
+
+    <div class="footer">
+      © <span id="yearNow"></span> CalcStack.tools
+    </div>
+
+  </div>
+
+<script>
+
+const money = n =>
+  new Intl.NumberFormat(undefined,{
+    style:"currency",
+    currency:"GBP"
+  }).format(n);
+
+const getVal = id =>
+  parseFloat(document.getElementById(id).value) || 0;
+
+function calculate(){
+
+  const price = getVal("price");
+  const extra = document.getElementById("extra").value === "yes";
+
+  let duty = 0;
+
+  const bands = [
+    [250000, 0.00],
+    [925000, 0.05],
+    [1500000, 0.10],
+    [Infinity, 0.12]
+  ];
+
+  let prev = 0;
+
+  for(const [limit, rate] of bands){
+
+    const taxable = Math.max(0, Math.min(price, limit) - prev);
+
+    duty += taxable * rate;
+
+    prev = limit;
+
+    if(price <= limit) break;
+
+  }
+
+  if(extra){
+
+    duty += price * 0.03;
+
+  }
+
+  const effective = price > 0 ? (duty / price) * 100 : 0;
+  const total = price + duty;
+
+  dutyOut.textContent = money(duty);
+  totalOut.textContent = money(total);
+  rateOut.textContent = effective.toFixed(2) + "%";
+
+  breakdown.textContent =
+    `Property price: ${money(price)} · Additional property: ${extra ? "Yes" : "No"}`;
+
+}
+
+function resetAll(){
+
+  price.value = 300000;
+  extra.value = "no";
+
+  calculate();
+
+}
+
+calcBtn.onclick = calculate;
+resetBtn.onclick = resetAll;
+
+yearNow.textContent = new Date().getFullYear();
+
+calculate();
+
+</script>
+
+</body>
+</html>
