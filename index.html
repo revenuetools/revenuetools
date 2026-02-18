@@ -3,15 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>CalcStack — Free Online Calculators</title>
   <meta name="description" content="CalcStack provides fast, free online calculators for creators, business, and everyday life." />
-  <meta name="robots" content="index, follow">
+  <meta name="robots" content="index, follow" />
+
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧮</text></svg>">
-  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="/css/styles.css" />
 </head>
 
 <body class="page">
   <div class="container">
+
     <div class="titleRow">
       <div>
         <h1>CalcStack</h1>
@@ -20,277 +23,239 @@
     </div>
 
     <div class="grid">
-      <!-- LEFT: Tools list -->
-<div class="card">
-  <h2 class="cardTitle">Tools</h2>
-  <p class="cardDesc">Start with our calculators. More coming next (pricing, loan, etc.).</p>
 
-  <div class="toolList">
-    <a class="tool toolLink" href="/creator-earnings-calculator" aria-label="Open Creator Earnings Calculator">
-      <div class="toolTitle">
-        Creator Earnings Calculator <span class="badge">LIVE</span>
+      <!-- LEFT COLUMN -->
+      <div>
+
+        <!-- Tools -->
+        <div class="card">
+          <h2 class="cardTitle">Tools</h2>
+          <p class="cardDesc">Start with our calculators. More coming soon.</p>
+
+          <div class="toolList">
+
+            <a class="tool toolLink" href="/creator-earnings-calculator" aria-label="Open Creator Earnings Calculator">
+              <div class="toolTitle">Creator Earnings Calculator <span class="badge">LIVE</span></div>
+              <small>Subscriptions + tips + “extra sales” (PPV/upsells)</small>
+            </a>
+
+            <a class="tool toolLink" href="/youtube-money-calculator" aria-label="Open YouTube Money Calculator">
+              <div class="toolTitle">YouTube Money Calculator <span class="badge">LIVE</span></div>
+              <small>Estimate earnings using views/day + RPM</small>
+            </a>
+
+            <a class="tool toolLink" href="/youtube-cpm-calculator" aria-label="Open YouTube CPM Calculator">
+              <div class="toolTitle">YouTube CPM Calculator <span class="badge">LIVE</span></div>
+              <small>Ad revenue from views + CPM</small>
+            </a>
+
+            <a class="tool toolLink" href="/tiktok-money-calculator" aria-label="Open TikTok Money Calculator">
+              <div class="toolTitle">TikTok Money Calculator <span class="badge">LIVE</span></div>
+              <small>Estimate earnings from views + brand deals</small>
+            </a>
+
+            <a class="tool toolLink" href="/twitch-earnings-calculator" aria-label="Open Twitch Earnings Calculator">
+              <div class="toolTitle">Twitch Earnings Calculator <span class="badge">LIVE</span></div>
+              <small>Subs + bits + ads + donations</small>
+            </a>
+
+            <a class="tool toolLink" href="/onlyfans-earnings-calculator" aria-label="Open OnlyFans Earnings Calculator">
+              <div class="toolTitle">OnlyFans Earnings Calculator <span class="badge">LIVE</span></div>
+              <small>Subs + PPV + tips (after fee)</small>
+            </a>
+
+            <a class="tool toolLink" href="/patreon-earnings-calculator" aria-label="Open Patreon Earnings Calculator">
+              <div class="toolTitle">Patreon Earnings Calculator <span class="badge">LIVE</span></div>
+              <small>Members + tips + extras (after fee)</small>
+            </a>
+
+            <a class="tool toolLink" href="/ad-revenue-calculator" aria-label="Open Ad Revenue Calculator">
+              <div class="toolTitle">Ad Revenue Calculator <span class="badge">LIVE</span></div>
+              <small>Estimate earnings from views, RPM, and monetized %</small>
+            </a>
+
+            <a class="tool toolLink" href="/cpm-calculator" aria-label="Open CPM Calculator">
+              <div class="toolTitle">CPM Calculator <span class="badge">LIVE</span></div>
+              <small>Cost per 1,000 impressions and earnings</small>
+            </a>
+
+            <a class="tool toolLink" href="/percentage-calculator" aria-label="Open Percentage Calculator">
+              <div class="toolTitle">Percentage Calculator <span class="badge">LIVE</span></div>
+              <small>Percent of, increase, decrease, and change</small>
+            </a>
+
+            <a class="tool toolLink" href="/profit-margin-calculator" aria-label="Open Profit Margin Calculator">
+              <div class="toolTitle">Profit Margin Calculator <span class="badge">LIVE</span></div>
+              <small>Profit, margin %, and markup %</small>
+            </a>
+
+            <a class="tool toolLink" href="/discount-calculator" aria-label="Open Discount Calculator">
+              <div class="toolTitle">Discount Calculator <span class="badge">LIVE</span></div>
+              <small>Sale price, savings, and percentage off</small>
+            </a>
+
+            <a class="tool toolLink" href="/break-even-calculator" aria-label="Open Break-Even Calculator">
+              <div class="toolTitle">Break-Even Calculator <span class="badge">LIVE</span></div>
+              <small>Units + revenue needed to break even</small>
+            </a>
+
+            <a class="tool toolLink" href="/roi-calculator" aria-label="Open ROI Calculator">
+              <div class="toolTitle">ROI Calculator <span class="badge">LIVE</span></div>
+              <small>Profit + ROI percentage instantly</small>
+            </a>
+
+            <a class="tool toolLink" href="/loan-calculator" aria-label="Open Loan Calculator">
+              <div class="toolTitle">Loan Calculator <span class="badge">LIVE</span></div>
+              <small>Monthly payment + total interest</small>
+            </a>
+
+            <!-- NOTE: Your site uses /savings-interest-calculator currently in this index.
+                 If your live page is actually /savings-calculator, change this href to /savings-calculator. -->
+            <a class="tool toolLink" href="/savings-interest-calculator" aria-label="Open Savings Interest Calculator">
+              <div class="toolTitle">Savings Interest Calculator <span class="badge">LIVE</span></div>
+              <small>Compound growth + contributions</small>
+            </a>
+
+            <a class="tool toolLink" href="/compound-interest-calculator" aria-label="Open Compound Interest Calculator">
+              <div class="toolTitle">Compound Interest Calculator <span class="badge">LIVE</span></div>
+              <small>Investment growth over time</small>
+            </a>
+
+            <a class="tool toolLink" href="/mortgage-calculator" aria-label="Open Mortgage Calculator">
+              <div class="toolTitle">Mortgage Calculator <span class="badge">LIVE</span></div>
+              <small>Monthly payments and total cost</small>
+            </a>
+
+            <a class="tool toolLink" href="/stamp-duty-calculator-uk" aria-label="Open Stamp Duty Calculator">
+              <div class="toolTitle">Stamp Duty Calculator (UK) <span class="badge">LIVE</span></div>
+              <small>SDLT property tax calculator</small>
+            </a>
+
+            <a class="tool toolLink" href="/vat-calculator" aria-label="Open VAT Calculator">
+              <div class="toolTitle">VAT Calculator (UK) <span class="badge">LIVE</span></div>
+              <small>Add or remove VAT</small>
+            </a>
+
+            <a class="tool toolLink" href="/income-tax-calculator-uk" aria-label="Open Income Tax Calculator">
+              <div class="toolTitle">Income Tax Calculator (UK) <span class="badge">LIVE</span></div>
+              <small>Estimate take-home pay after tax + NI</small>
+            </a>
+
+            <a class="tool toolLink" href="/salary-to-hourly-calculator" aria-label="Open Salary to Hourly Calculator">
+              <div class="toolTitle">Salary to Hourly Calculator <span class="badge">LIVE</span></div>
+              <small>Convert annual salary into hourly pay</small>
+            </a>
+
+            <a class="tool toolLink" href="/hourly-to-salary-calculator" aria-label="Open Hourly to Salary Calculator">
+              <div class="toolTitle">Hourly to Salary Calculator <span class="badge">LIVE</span></div>
+              <small>Convert hourly wage into annual salary</small>
+            </a>
+
+            <a class="tool toolLink" href="/markup-calculator" aria-label="Open Markup Calculator">
+              <div class="toolTitle">Markup Calculator <span class="badge">LIVE</span></div>
+              <small>Selling price + margin %</small>
+            </a>
+
+            <a class="tool toolLink" href="/commission-calculator" aria-label="Open Commission Calculator">
+              <div class="toolTitle">Commission Calculator <span class="badge">LIVE</span></div>
+              <small>Commission + net earnings after fees</small>
+            </a>
+
+          </div>
+        </div>
+
+        <!-- Most Used -->
+        <div class="card" style="margin-top:18px;">
+          <h2 class="cardTitle">Most Used Calculators</h2>
+          <p class="cardDesc">Frequently used tools for creators, business, finance, and everyday calculations.</p>
+
+          <div class="toolList">
+            <a class="tool toolLink" href="/percentage-calculator">
+              <div class="toolTitle">Percentage Calculator</div>
+              <small>Percent of, increase, decrease, and change</small>
+            </a>
+
+            <a class="tool toolLink" href="/loan-calculator">
+              <div class="toolTitle">Loan Calculator</div>
+              <small>Monthly payments, total interest, and cost</small>
+            </a>
+
+            <!-- If your live savings page is /savings-interest-calculator, keep as-is. If not, swap to /savings-calculator -->
+            <a class="tool toolLink" href="/savings-interest-calculator">
+              <div class="toolTitle">Savings Interest Calculator</div>
+              <small>See how savings grow over time with interest</small>
+            </a>
+
+            <a class="tool toolLink" href="/mortgage-calculator">
+              <div class="toolTitle">Mortgage Calculator</div>
+              <small>Monthly payments and total cost</small>
+            </a>
+
+            <a class="tool toolLink" href="/stamp-duty-calculator-uk">
+              <div class="toolTitle">Stamp Duty Calculator (UK)</div>
+              <small>SDLT property tax calculator</small>
+            </a>
+
+            <a class="tool toolLink" href="/compound-interest-calculator">
+              <div class="toolTitle">Compound Interest Calculator</div>
+              <small>Investment growth over time</small>
+            </a>
+
+            <a class="tool toolLink" href="/youtube-money-calculator">
+              <div class="toolTitle">YouTube Money Calculator</div>
+              <small>Estimate earnings from views, RPM, and extras</small>
+            </a>
+
+            <a class="tool toolLink" href="/youtube-cpm-calculator">
+              <div class="toolTitle">YouTube CPM Calculator</div>
+              <small>Ad revenue from views and CPM</small>
+            </a>
+
+            <a class="tool toolLink" href="/tiktok-money-calculator">
+              <div class="toolTitle">TikTok Money Calculator</div>
+              <small>Estimate earnings from views and brand deals</small>
+            </a>
+
+            <a class="tool toolLink" href="/onlyfans-earnings-calculator">
+              <div class="toolTitle">OnlyFans Earnings Calculator</div>
+              <small>Subs, PPV, and tips (after fee)</small>
+            </a>
+
+            <a class="tool toolLink" href="/patreon-earnings-calculator">
+              <div class="toolTitle">Patreon Earnings Calculator</div>
+              <small>Members, tips, and extras (after fee)</small>
+            </a>
+
+            <a class="tool toolLink" href="/twitch-earnings-calculator">
+              <div class="toolTitle">Twitch Earnings Calculator</div>
+              <small>Subs, bits, ads, and donations</small>
+            </a>
+
+            <a class="tool toolLink" href="/vat-calculator">
+              <div class="toolTitle">VAT Calculator (UK)</div>
+              <small>Add or remove VAT</small>
+            </a>
+
+            <a class="tool toolLink" href="/income-tax-calculator-uk">
+              <div class="toolTitle">Income Tax Calculator (UK)</div>
+              <small>Estimate take-home pay after tax + NI</small>
+            </a>
+
+            <a class="tool toolLink" href="/salary-to-hourly-calculator">
+              <div class="toolTitle">Salary to Hourly Calculator</div>
+              <small>Convert annual salary into hourly pay</small>
+            </a>
+
+            <a class="tool toolLink" href="/hourly-to-salary-calculator">
+              <div class="toolTitle">Hourly to Salary Calculator</div>
+              <small>Convert hourly wage into annual salary</small>
+            </a>
+          </div>
+        </div>
+
       </div>
-      <small>Subscriptions + tips + “extra sales” (PPV/upsells)</small>
-    </a>
 
-    <a class="tool toolLink" href="/roi-calculator" aria-label="Open ROI Calculator">
-      <div class="toolTitle">
-        ROI Calculator <span class="badge">LIVE</span>
-      </div>
-      <small>Profit + ROI percentage instantly</small>
-    </a>
-
-    <a class="tool toolLink" href="/ad-revenue-calculator" aria-label="Open Ad Revenue Calculator">
-      <div class="toolTitle">
-        Ad Revenue Calculator <span class="badge">LIVE</span>
-      </div>
-      <small>Estimate earnings from views, RPM, and monetized %</small>
-    </a>
-
-    <a class="tool toolLink" href="/youtube-money-calculator" aria-label="Open YouTube Money Calculator">
-  <div class="toolTitle">
-    YouTube Money Calculator <span class="badge">LIVE</span>
-     </div>
-     <small>Estimate earnings using views/day + RPM</small>
-     </a>
-
-    <a class="tool toolLink" href="/cpm-calculator">
-  <div class="toolTitle">
-    CPM Calculator <span class="badge">LIVE</span>
-  </div>
-  <small>Calculate cost per 1,000 impressions</small>
-  </a>
-
-    <a class="tool toolLink" href="/profit-margin-calculator">
-  <div class="toolTitle">
-    Profit Margin Calculator <span class="badge">LIVE</span>
-  </div>
-  <small>Profit, margin %, and markup %</small>
-</a>
-
-    <a class="tool toolLink" href="/break-even-calculator">
-  <div class="toolTitle">
-    Break-Even Calculator <span class="badge">LIVE</span>
-  </div>
-  <small>Units + revenue needed to break even</small>
-</a>
-
-    <a class="tool toolLink" href="/discount-calculator">
-  <div class="toolTitle">
-    Discount Calculator <span class="badge">LIVE</span>
-  </div>
-  <small>Sale price, savings, and final price</small>
-</a>
-
-    <a class="tool toolLink" href="/percentage-calculator">
-  <div class="toolTitle">
-    Percentage Calculator <span class="badge">LIVE</span>
-  </div>
-  <small>Percent of, increase, and decrease</small>
-</a>
-
-    <a class="tool toolLink" href="/loan-calculator">
-  <div class="toolTitle">
-    Loan Calculator <span class="badge">LIVE</span>
-  </div>
-  <small>Monthly payment + total interest</small>
-</a>
-
-    <a class="tool toolLink" href="/savings-interest-calculator">
-  <div class="toolTitle">
-    Savings Interest Calculator <span class="badge">LIVE</span>
-  </div>
-  <small>Compound growth + contributions</small>
-</a>
-    
-    <a class="tool toolLink" href="/markup-calculator">
-  <div class="toolTitle">
-    Markup Calculator <span class="badge">LIVE</span>
-  </div>
-  <small>Selling price + margin %</small>
-</a>
-
-    <a class="tool toolLink" href="/commission-calculator">
-  <div class="toolTitle">
-    Commission Calculator <span class="badge">LIVE</span>
-  </div>
-  <small>Commission + net earnings after fees</small>
-</a>
-
-    <a class="tool toolLink" href="/onlyfans-earnings-calculator">
-  <div class="toolTitle">
-    OnlyFans Earnings Calculator <span class="badge">LIVE</span>
-  </div>
-  <small>Subs + PPV + tips (after fee)</small>
-</a>
-
-    <a class="tool toolLink" href="/patreon-earnings-calculator">
-  <div class="toolTitle">
-    Patreon Earnings Calculator <span class="badge">LIVE</span>
-  </div>
-  <small>Members + tips + extras (after fee)</small>
-</a>
-
-    <a class="tool toolLink" href="/tiktok-money-calculator">
-  <div class="toolTitle">
-    TikTok Money Calculator <span class="badge">LIVE</span>
-  </div>
-  <small>Estimate earnings from views + brand deals</small>
-</a>
-
-    <a class="tool toolLink" href="/twitch-earnings-calculator">
-  <div class="toolTitle">
-    Twitch Earnings Calculator <span class="badge">LIVE</span>
-  </div>
-  <small>Subs + bits + ads + donations</small>
-</a>
-
-    <a class="tool toolLink" href="/youtube-cpm-calculator">
-  <div class="toolTitle">
-    YouTube CPM Calculator <span class="badge">LIVE</span>
-  </div>
-  <small>Ad revenue from views + CPM</small>
-</a>
-
-    <a class="tool toolLink" href="/compound-interest-calculator">
-  <div class="toolTitle">Compound Interest Calculator<span class="badge">LIVE</span>
-  </div>
-  <small>Investment growth over time</small>
-  </a>
-    
-    <div class="tool disabled" aria-disabled="true">
-      <div class="toolTitle">
-        Pricing Calculator <span class="badge">NEXT</span>
-      </div>
-      <small>Find profitable pricing after fees + costs</small>
-    </div>
-
-    <div class="tool disabled" aria-disabled="true">
-      <div class="toolTitle">
-        Loan Calculator <span class="badge">NEXT</span>
-      </div>
-      <small>Monthly payments + total interest</small>
-    </div>
-  </div>
-</div>
-
-      <div class="card">
-
-  <h2 class="cardTitle">Most Used Calculators</h2>
-
-<p class="cardDesc">
-  Frequently used tools for creators, business, finance, and everyday calculations.
-</p>
-
-<div class="toolList">
-
-  <a class="tool toolLink" href="/percentage-calculator">
-    <div class="toolTitle">Percentage Calculator</div>
-    <small>Percent of, increase, decrease, and change</small>
-  </a>
-
-  <a class="tool toolLink" href="/loan-calculator">
-    <div class="toolTitle">Loan Calculator</div>
-    <small>Monthly payments, total interest, and cost</small>
-  </a>
-
-  <a class="tool toolLink" href="/savings-calculator">
-    <div class="toolTitle">Savings Interest Calculator</div>
-    <small>See how savings grow over time with interest</small>
-  </a>
-
-  <a class="tool toolLink" href="/mortgage-calculator">
-  <div class="toolTitle">Mortgage Calculator</div>
-  <small>Monthly payments and total cost</small>
-</a>
-
-  <a class="tool toolLink" href="/stamp-duty-calculator-uk">
-  <div class="toolTitle">Stamp Duty Calculator (UK)</div>
-  <small>SDLT property tax calculator</small>
-</a>
-
-  <a class="tool toolLink" href="/compound-interest-calculator">
-  <div class="toolTitle">Compound Interest Calculator</div>
-  <small>Investment growth over time</small>
-  </a>
-
-  <a class="tool toolLink" href="/youtube-money-calculator">
-    <div class="toolTitle">YouTube Money Calculator</div>
-    <small>Estimate earnings from views, RPM, and extras</small>
-  </a>
-
-  <a class="tool toolLink" href="/youtube-cpm-calculator">
-    <div class="toolTitle">YouTube CPM Calculator</div>
-    <small>Ad revenue from views and CPM</small>
-  </a>
-
-  <a class="tool toolLink" href="/tiktok-money-calculator">
-    <div class="toolTitle">TikTok Money Calculator</div>
-    <small>Estimate earnings from views and brand deals</small>
-  </a>
-
-  <a class="tool toolLink" href="/onlyfans-earnings-calculator">
-    <div class="toolTitle">OnlyFans Earnings Calculator</div>
-    <small>Subs, PPV, and tips (after fee)</small>
-  </a>
-
-  <a class="tool toolLink" href="/patreon-earnings-calculator">
-    <div class="toolTitle">Patreon Earnings Calculator</div>
-    <small>Members, tips, and extras (after fee)</small>
-  </a>
-
-  <a class="tool toolLink" href="/twitch-earnings-calculator">
-    <div class="toolTitle">Twitch Earnings Calculator</div>
-    <small>Subs, bits, ads, and donations</small>
-  </a>
-
-  <a class="tool toolLink" href="/cpm-calculator">
-    <div class="toolTitle">CPM Calculator</div>
-    <small>Cost per 1,000 impressions and earnings</small>
-  </a>
-
-  <a class="tool toolLink" href="/profit-margin-calculator">
-    <div class="toolTitle">Profit Margin Calculator</div>
-    <small>Profit, margin %, and markup</small>
-  </a>
-
-  <a class="tool toolLink" href="/vat-calculator">
-  <div class="toolTitle">VAT Calculator</div>
-  <small>Add or remove VAT (UK)</small>
-</a>
-
-  <a class="tool toolLink" href="/income-tax-calculator-uk">
-  <div class="toolTitle">Income Tax Calculator (UK)</div>
-  <small>Estimate take-home pay after tax + NI</small>
-</a>
-
-  <a class="tool toolLink" href="/discount-calculator">
-    <div class="toolTitle">Discount Calculator</div>
-    <small>Sale price, savings, and percentage off</small>
-  </a>
-
-  <a class="tool toolLink" href="/salary-to-hourly-calculator">
-  <div class="toolTitle">Salary to Hourly Calculator</div>
-  <small>Convert annual salary into hourly pay</small>
-</a>
-
-  <a class="tool toolLink" href="/hourly-to-salary-calculator">
-  <div class="toolTitle">Hourly to Salary Calculator</div>
-  <small>Convert hourly wage into annual salary</small>
-</a>
-
-  <a class="tool toolLink" href="/roi-calculator">
-    <div class="toolTitle">ROI Calculator</div>
-    <small>Return on investment percentage</small>
-  </a>
-
-</div>
-
-</div>
-
-
-
-      <!-- RIGHT: Quick calculator preview -->
+      <!-- RIGHT COLUMN: Quick calculator preview -->
       <div class="card" id="creatorCalcCard">
         <h2 class="cardTitle">
           <a class="titleLink" href="/creator-earnings-calculator">Creator Earnings Calculator</a>
@@ -325,9 +290,7 @@
             <input id="fee" type="number" inputmode="decimal" min="0" max="100" step="0.1" placeholder="e.g. 20" value="20">
           </div>
           <div>
-            <label for="expenses">
-              Monthly expenses (£) <span class="hint">optional</span>
-            </label>
+            <label for="expenses">Monthly expenses (£) <span class="hint">optional</span></label>
             <input id="expenses" type="number" inputmode="decimal" min="0" step="0.01" placeholder="e.g. 150" value="0">
           </div>
         </div>
@@ -357,14 +320,16 @@
           Note: This is an estimate. Taxes vary by country and are not included.
         </p>
       </div>
+
     </div>
 
     <div class="footer">
       © <span id="yearNow"></span> CalcStack.tools ·
       <a href="#" id="privacyLink">Privacy</a> ·
-      <a href="#" id="termsLink">Terms</a>
+      <a href="#" id="termsLink">Terms</a> ·
       <a href="/calculators">All Calculators</a>
     </div>
+
   </div>
 
   <script>
@@ -433,42 +398,9 @@
       alert("Terms page coming next. Calculator results are estimates only.");
     });
 
-    // footer year
     document.getElementById("yearNow").textContent = new Date().getFullYear();
-
-    // run once on load
     calculate();
   </script>
+
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
