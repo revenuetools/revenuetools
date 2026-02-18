@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>VAT Calculator (UK) — Add or Remove VAT | CalcStack</title>
+  <meta name="description" content="Free UK VAT calculator. Add VAT, remove VAT, and calculate VAT amounts instantly. Supports standard and custom VAT rates.">
+
+  <link rel="canonical" href="https://calcstack.tools/vat-calculator">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+
+<body class="page">
+  <div class="container">
+
+    <h1 style="margin-bottom:8px;">VAT Calculator (UK)</h1>
+
+    <p class="subtitle" style="max-width:860px;margin:0 auto 18px;">
+      Add VAT, remove VAT, and calculate the VAT amount using the UK standard rate or a custom percentage.
+    </p>
+
+    <div class="card" style="max-width:920px;margin:0 auto;">
+
+      <div class="row">
+        <div>
+          <label for="amount">Amount (£)</label>
+          <input id="amount" type="number" value="100" min="0" step="0.01">
+        </div>
+
+        <div>
+          <label for="rate">VAT rate (%)</label>
+          <input id="rate" type="number" value="20" min="0" step="0.01">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="mode">Calculation type</label>
+          <select id="mode">
+            <option value="add">Add VAT</option>
+            <option value="remove">Remove VAT</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button id="calcBtn">Calculate</button>
+        <button class="secondary" id="resetBtn">Reset</button>
+        <a href="/" style="margin-left:6px;">Back to all tools</a>
+      </div>
+
+      <div class="results">
+
+        <div class="kpi">
+
+          <div class="kpiBox">
+            <div class="label">Net amount</div>
+            <div class="value" id="netOut">—</div>
+            <div class="muted">Before VAT</div>
+          </div>
+
+          <div class="kpiBox">
+            <div class="label">VAT amount</div>
+            <div class="value" id="vatOut">—</div>
+            <div class="muted">Tax portion</div>
+          </div>
+
+          <div class="kpiBox">
+            <div class="label">Gross amount</div>
+            <div class="value" id="grossOut">—</div>
+            <div class="muted">After VAT</div>
+          </div>
+
+        </div>
+
+        <div class="muted" id="breakdown" style="margin-top:10px;"></div>
+
+      </div>
+
+      <div class="muted" style="margin-top:12px;font-size:12px;">
+        UK standard VAT rate is currently 20%. Reduced rates may apply in some cases.
+      </div>
+
+      <!-- RELATED CALCULATORS -->
+      <hr style="border:0;border-top:1px solid rgba(255,255,255,0.10);margin:18px 0;">
+
+      <div class="muted" style="font-size:13px;line-height:1.6;">
+        Related calculators:
+        <a href="/profit-margin-calculator">Profit Margin Calculator</a> ·
+        <a href="/percentage-calculator">Percentage Calculator</a> ·
+        <a href="/discount-calculator">Discount Calculator</a> ·
+        <a href="/roi-calculator">ROI Calculator</a>
+      </div>
+
+    </div>
+
+    <div class="footer">
+      © <span id="yearNow"></span> CalcStack.tools
+    </div>
+
+  </div>
+
+<script>
+
+const money = n =>
+  new Intl.NumberFormat(undefined,{
+    style:"currency",
+    currency:"GBP"
+  }).format(n);
+
+const getVal = id =>
+  parseFloat(document.getElementById(id).value) || 0;
+
+function calculate(){
+
+  const amount = getVal("amount");
+  const rate = getVal("rate") / 100;
+  const mode = document.getElementById("mode").value;
+
+  let net, vat, gross;
+
+  if(mode === "add"){
+
+    net = amount;
+    vat = net * rate;
+    gross = net + vat;
+
+  } else {
+
+    gross = amount;
+    net = gross / (1 + rate);
+    vat = gross - net;
+
+  }
+
+  netOut.textContent = money(net);
+  vatOut.textContent = money(vat);
+  grossOut.textContent = money(gross);
+
+  breakdown.textContent =
+    `Amount: ${money(amount)} · VAT rate: ${(rate*100).toFixed(2)}% · Mode: ${mode === "add" ? "Add VAT" : "Remove VAT"}`;
+
+}
+
+function resetAll(){
+
+  amount.value = 100;
+  rate.value = 20;
+  mode.value = "add";
+
+  calculate();
+
+}
+
+calcBtn.onclick = calculate;
+resetBtn.onclick = resetAll;
+
+yearNow.textContent = new Date().getFullYear();
+
+calculate();
+
+</script>
+
+</body>
+</html>
