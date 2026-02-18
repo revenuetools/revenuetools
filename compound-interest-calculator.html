@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Compound Interest Calculator — Investment Growth Over Time | CalcStack</title>
+  <meta name="description" content="Free compound interest calculator. Calculate investment growth, interest earned, and final value with compound interest and monthly contributions.">
+
+  <link rel="canonical" href="https://calcstack.tools/compound-interest-calculator">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+
+<body class="page">
+  <div class="container">
+
+    <h1 style="margin-bottom:8px;">Compound Interest Calculator</h1>
+
+    <p class="subtitle" style="max-width:860px;margin:0 auto 18px;">
+      Calculate how your savings or investments grow over time with compound interest and optional monthly contributions.
+    </p>
+
+    <div class="card" style="max-width:920px;margin:0 auto;">
+
+      <div class="row">
+        <div>
+          <label for="principal">Starting amount (£)</label>
+          <input id="principal" type="number" value="1000" min="0" step="0.01">
+        </div>
+
+        <div>
+          <label for="rate">Interest rate (% per year)</label>
+          <input id="rate" type="number" value="5" min="0" step="0.01">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="years">Time period (years)</label>
+          <input id="years" type="number" value="10" min="0" step="1">
+        </div>
+
+        <div>
+          <label for="contribution">Monthly contribution (£)</label>
+          <input id="contribution" type="number" value="100" min="0" step="0.01">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="compound">Compound frequency</label>
+          <select id="compound">
+            <option value="1">Yearly</option>
+            <option value="4">Quarterly</option>
+            <option value="12" selected>Monthly</option>
+            <option value="365">Daily</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button id="calcBtn">Calculate</button>
+        <button class="secondary" id="resetBtn">Reset</button>
+        <a href="/" style="margin-left:6px;">Back to all tools</a>
+      </div>
+
+      <div class="results">
+
+        <div class="kpi">
+
+          <div class="kpiBox">
+            <div class="label">Final value</div>
+            <div class="value" id="finalOut">—</div>
+            <div class="muted">Total balance after growth</div>
+          </div>
+
+          <div class="kpiBox">
+            <div class="label">Interest earned</div>
+            <div class="value" id="interestOut">—</div>
+            <div class="muted">Profit from compound interest</div>
+          </div>
+
+          <div class="kpiBox">
+            <div class="label">Total contributions</div>
+            <div class="value" id="contribOut">—</div>
+            <div class="muted">Starting amount + deposits</div>
+          </div>
+
+          <div class="kpiBox">
+            <div class="label">Growth multiplier</div>
+            <div class="value" id="multiplierOut">—</div>
+            <div class="muted">Final ÷ starting amount</div>
+          </div>
+
+        </div>
+
+        <div class="muted" id="breakdown" style="margin-top:10px;"></div>
+
+      </div>
+
+      <div class="muted" style="margin-top:12px;font-size:12px;">
+        Compound interest allows your money to grow faster by earning interest on both your initial deposit and accumulated interest.
+      </div>
+
+      <!-- RELATED CALCULATORS -->
+      <hr style="border:0;border-top:1px solid rgba(255,255,255,0.10);margin:18px 0;">
+
+      <div class="muted" style="font-size:13px;line-height:1.6;">
+        Related calculators:
+        <a href="/savings-calculator">Savings Interest Calculator</a> ·
+        <a href="/loan-calculator">Loan Calculator</a> ·
+        <a href="/percentage-calculator">Percentage Calculator</a> ·
+        <a href="/profit-margin-calculator">Profit Margin Calculator</a>
+      </div>
+
+    </div>
+
+    <div class="footer">
+      © <span id="yearNow"></span> CalcStack.tools
+    </div>
+
+  </div>
+
+<script>
+
+const money = n =>
+  new Intl.NumberFormat(undefined,{
+    style:"currency",
+    currency:"GBP"
+  }).format(n);
+
+const getVal = id =>
+  parseFloat(document.getElementById(id).value) || 0;
+
+function calculate(){
+
+  const P = getVal("principal");
+  const r = getVal("rate") / 100;
+  const t = getVal("years");
+  const PMT = getVal("contribution");
+  const n = getVal("compound");
+
+  let value = P;
+  const totalMonths = t * 12;
+
+  for(let m=0; m<totalMonths; m++){
+    value += PMT;
+    value *= (1 + r/n);
+  }
+
+  const contributions = P + (PMT * totalMonths);
+  const interest = value - contributions;
+  const multiplier = P > 0 ? (value / P).toFixed(2) : "—";
+
+  finalOut.textContent = money(value);
+  interestOut.textContent = money(interest);
+  contribOut.textContent = money(contributions);
+  multiplierOut.textContent = multiplier + "×";
+
+  breakdown.textContent =
+    `Start: ${money(P)} · Rate: ${(r*100).toFixed(2)}% · Years: ${t} · Monthly deposit: ${money(PMT)}`;
+
+}
+
+function resetAll(){
+
+  principal.value = 1000;
+  rate.value = 5;
+  years.value = 10;
+  contribution.value = 100;
+  compound.value = 12;
+
+  calculate();
+
+}
+
+calcBtn.onclick = calculate;
+resetBtn.onclick = resetAll;
+
+yearNow.textContent = new Date().getFullYear();
+
+calculate();
+
+</script>
+
+</body>
+</html>
