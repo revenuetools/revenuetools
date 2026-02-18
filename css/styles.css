@@ -3,11 +3,14 @@
 :root{
   --bg:#0f172a;
   --bg2:#0b1220;
+
   --card:#1e293b;
   --card2:#111827;
+
   --text:#ffffff;
   --muted:#94a3b8;
   --muted2:#64748b;
+
   --line:#334155;
   --accent:#38bdf8;
 
@@ -16,7 +19,7 @@
   --shadow: 0 18px 50px rgba(0,0,0,0.35);
 }
 
-*{box-sizing:border-box}
+*{ box-sizing:border-box; }
 
 body{
   font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,Helvetica,Arial;
@@ -29,12 +32,14 @@ body{
   text-align:center;
 }
 
-a{color:var(--accent);text-decoration:none}
-a:hover{text-decoration:underline}
+a{ color:var(--accent); text-decoration:none; }
+a:hover{ text-decoration:underline; }
 
-.hidden{display:none}
+.hidden{ display:none; }
 
-/* shared layout */
+/* -----------------------------
+   Layout
+-------------------------------- */
 .container{
   max-width:980px;
   margin:0 auto;
@@ -48,9 +53,16 @@ a:hover{text-decoration:underline}
   align-items:flex-start;
   justify-content:center;
 }
-.page .container{width:100%}
+.page .container{ width:100%; }
 
-/* typography */
+/* Slightly better spacing on very wide screens */
+@media (min-width:1100px){
+  .container{ max-width:1040px; }
+}
+
+/* -----------------------------
+   Typography
+-------------------------------- */
 h1{
   font-size:44px;
   letter-spacing:-0.02em;
@@ -64,7 +76,34 @@ h1{
   line-height:1.45;
 }
 
-/* cards + panels */
+/* Utility text helpers */
+.hint{
+  color:var(--muted2);
+  font-size:12px;
+  margin-left:6px;
+}
+
+.breakdown{
+  margin-top:10px;
+  font-size:13px;
+  line-height:1.5;
+}
+
+.note{
+  margin-top:12px;
+  font-size:12px;
+  line-height:1.4;
+}
+
+/* Related calculators block helper */
+.related{
+  font-size:13px;
+  line-height:1.6;
+}
+
+/* -----------------------------
+   Cards / Panels
+-------------------------------- */
 .card, .panel{
   background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
   border:1px solid rgba(255,255,255,0.10);
@@ -80,22 +119,26 @@ h1{
   .card{ background: rgba(30,41,59,0.70); }
 }
 
-/* homepage grid */
+/* -----------------------------
+   Grid
+-------------------------------- */
 .grid{
   display:grid;
-  grid-template-columns: 1fr;
+  grid-template-columns:1fr;
   gap:18px;
   margin-top:20px;
 }
-@media (min-width: 900px){
-  .grid{grid-template-columns: 1fr 1fr;}
+@media (min-width:900px){
+  .grid{ grid-template-columns:1fr 1fr; }
 }
 
-/* tool tiles */
+/* -----------------------------
+   Tool tiles
+-------------------------------- */
 .toolList{
   margin-top:14px;
   display:grid;
-  grid-template-columns: 1fr;
+  grid-template-columns:1fr;
   gap:10px;
 }
 
@@ -123,7 +166,7 @@ h1{
   margin-top:4px;
 }
 
-/* NEW: disabled tool state (use instead of inline opacity/cursor) */
+/* Disabled tool state */
 .tool.disabled{
   opacity:.55;
   cursor:not-allowed;
@@ -134,7 +177,7 @@ h1{
   border-color: rgba(255,255,255,0.10);
 }
 
-/* badge */
+/* Badge */
 .badge{
   display:inline-block;
   font-size:12px;
@@ -147,7 +190,9 @@ h1{
   vertical-align:middle;
 }
 
-/* tool page header helpers */
+/* -----------------------------
+   Header helpers
+-------------------------------- */
 .titleRow{
   display:flex;
   flex-direction:column;
@@ -168,14 +213,13 @@ h1{
   border-radius:999px;
   background: rgba(255,255,255,0.03);
 }
-
 .backlink:hover{
   color:var(--text);
   border-color: rgba(56,189,248,0.25);
   text-decoration:none;
 }
 
-/* NEW: shared tool-page sizing + header spacing (no inline styles needed) */
+/* Shared tool-page sizing (optional helpers) */
 .pageHead{
   max-width:920px;
   margin:0 auto 18px;
@@ -184,34 +228,18 @@ h1{
   max-width:920px;
   margin:0 auto;
 }
-.hint{
-  color:var(--muted2);
-  font-size:12px;
-  margin-left:6px;
-}
-.inlineLink{
-  margin-left:6px;
-}
-.breakdown{
-  margin-top:10px;
-  font-size:13px;
-  line-height:1.5;
-}
-.note{
-  margin-top:12px;
-  font-size:12px;
-  line-height:1.4;
-}
 
-/* forms */
+/* -----------------------------
+   Forms
+-------------------------------- */
 .row{
   display:grid;
-  grid-template-columns: 1fr;
+  grid-template-columns:1fr;
   gap:12px;
   margin-top:12px;
 }
-@media (min-width: 640px){
-  .row{grid-template-columns: 1fr 1fr;}
+@media (min-width:640px){
+  .row{ grid-template-columns:1fr 1fr; }
 }
 
 label{
@@ -221,7 +249,7 @@ label{
   margin:0 0 6px;
 }
 
-input{
+input, select{
   width:100%;
   padding:12px 12px;
   border-radius:var(--radius-sm);
@@ -232,16 +260,14 @@ input{
   height:44px;
 }
 
-/* better focus (keyboard users) */
-input:focus{
+input:focus, select:focus{
   border-color: rgba(56,189,248,0.7);
   box-shadow: 0 0 0 3px rgba(56,189,248,0.18);
 }
-input:focus-visible{
-  outline: none;
-}
 
-/* actions */
+/* -----------------------------
+   Actions / Buttons
+-------------------------------- */
 .actions{
   display:flex;
   align-items:center;
@@ -250,14 +276,13 @@ input:focus-visible{
   flex-wrap:wrap;
   margin-top:16px;
 }
-.actionsTight{ align-items:center; }
 
 button{
   padding:12px 16px;
   border-radius:var(--radius-sm);
   border:1px solid rgba(255,255,255,0.16);
   background: rgba(56,189,248,0.14);
-  color: var(--text);
+  color:var(--text);
   cursor:pointer;
   transition:0.18s ease;
   font-weight:700;
@@ -280,7 +305,9 @@ button:active{ transform: translateY(1px); }
   border-color: rgba(255,255,255,0.22);
 }
 
-/* results */
+/* -----------------------------
+   Results
+-------------------------------- */
 .results{
   margin-top:14px;
   padding:14px;
@@ -298,12 +325,12 @@ button:active{ transform: translateY(1px); }
 
 .kpi{
   display:grid;
-  grid-template-columns: 1fr;
+  grid-template-columns:1fr;
   gap:10px;
   margin-top:10px;
 }
-@media (min-width: 640px){
-  .kpi{grid-template-columns: 1fr 1fr;}
+@media (min-width:640px){
+  .kpi{ grid-template-columns:1fr 1fr; }
 }
 
 .kpiBox{
@@ -325,7 +352,9 @@ button:active{ transform: translateY(1px); }
   letter-spacing:-0.3px;
 }
 
-/* footer */
+/* -----------------------------
+   Footer
+-------------------------------- */
 .footer{
   margin-top:40px;
   color:var(--muted2);
@@ -333,12 +362,9 @@ button:active{ transform: translateY(1px); }
   text-align:center;
 }
 
-/* Slightly better spacing on very wide screens */
-@media (min-width: 1100px){
-  .container{ max-width: 1040px; }
-}
-
-/* reduce motion preference */
+/* -----------------------------
+   Reduced motion
+-------------------------------- */
 @media (prefers-reduced-motion: reduce){
   .tool, button{ transition:none; }
   .tool:hover{ transform:none; }
