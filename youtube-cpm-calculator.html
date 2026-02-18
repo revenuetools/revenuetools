@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>YouTube CPM Calculator — Estimate Ad Revenue From Views | CalcStack</title>
+  <meta name="description" content="Free YouTube CPM calculator. Estimate ad revenue from views using CPM and YouTube revenue share. Calculate creator earnings instantly.">
+
+  <link rel="canonical" href="https://calcstack.tools/youtube-cpm-calculator">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+
+<body class="page">
+  <div class="container">
+
+    <h1 style="margin-bottom:8px;">YouTube CPM Calculator</h1>
+
+    <p class="subtitle" style="max-width:900px;margin:0 auto 18px;">
+      Estimate YouTube ad revenue using CPM (cost per 1,000 views) and YouTube's revenue share.
+    </p>
+
+    <div class="card" style="max-width:920px;margin:0 auto;">
+
+      <div class="row">
+        <div>
+          <label for="views">Views</label>
+          <input id="views" type="number" inputmode="numeric" min="0" step="1" value="100000">
+        </div>
+
+        <div>
+          <label for="cpm">CPM (£ per 1,000 views)</label>
+          <input id="cpm" type="number" inputmode="decimal" min="0" step="0.01" value="6.00">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="creatorPct">Creator share (%)</label>
+          <input id="creatorPct" type="number" inputmode="decimal" min="0" max="100" step="0.1" value="55">
+          <div class="muted" style="font-size:12px;margin-top:6px;">
+            YouTube typically pays creators ~55% of ad revenue.
+          </div>
+        </div>
+
+        <div>
+          <label for="rpm">Equivalent RPM (£)</label>
+          <input id="rpm" type="text" readonly>
+          <div class="muted" style="font-size:12px;margin-top:6px;">
+            Revenue per 1,000 views after YouTube's cut.
+          </div>
+        </div>
+      </div>
+
+      <div class="actions" style="align-items:center;">
+        <button id="calcBtn" type="button">Calculate</button>
+        <button class="secondary" id="resetBtn" type="button">Reset</button>
+        <a href="/" style="margin-left:6px;">Back to all tools</a>
+      </div>
+
+      <div class="results" style="margin-top:16px;">
+        <div class="kpi">
+
+          <div class="kpiBox">
+            <div class="label">Creator earnings</div>
+            <div class="value" id="earningsOut">—</div>
+            <div class="muted">From ads only</div>
+          </div>
+
+          <div class="kpiBox">
+            <div class="label">YouTube's share</div>
+            <div class="value" id="youtubeOut">—</div>
+            <div class="muted">Platform portion</div>
+          </div>
+
+          <div class="kpiBox">
+            <div class="label">Total ad revenue</div>
+            <div class="value" id="grossOut">—</div>
+            <div class="muted">Before YouTube cut</div>
+          </div>
+
+          <div class="kpiBox">
+            <div class="label">Per-view earnings</div>
+            <div class="value" id="perViewOut">—</div>
+            <div class="muted">Creator earnings per view</div>
+          </div>
+
+        </div>
+
+        <div class="muted" id="breakdown" style="margin-top:10px;"></div>
+
+      </div>
+
+      <div class="muted" style="margin-top:12px;font-size:12px;">
+        Note: Actual earnings vary based on audience, niche, country, and advertiser demand.
+      </div>
+
+    </div>
+
+    <div class="footer">
+      © <span id="yearNow"></span> CalcStack.tools
+    </div>
+
+  </div>
+
+<script>
+
+const money = n =>
+  new Intl.NumberFormat(undefined, {
+    style: "currency",
+    currency: "GBP"
+  }).format(n);
+
+const getVal = id =>
+  Math.max(0, parseFloat(document.getElementById(id).value) || 0);
+
+function calculate(){
+
+  const views = getVal("views");
+  const cpm = getVal("cpm");
+  const creatorPct = getVal("creatorPct");
+
+  const gross = (views / 1000) * cpm;
+
+  const creator = gross * (creatorPct / 100);
+  const youtube = gross - creator;
+
+  const rpm = cpm * (creatorPct / 100);
+
+  const perView = views > 0 ? creator / views : 0;
+
+  document.getElementById("earningsOut").textContent = money(creator);
+  document.getElementById("youtubeOut").textContent = money(youtube);
+  document.getElementById("grossOut").textContent = money(gross);
+  document.getElementById("perViewOut").textContent = money(perView);
+
+  document.getElementById("rpm").value = money(rpm);
+
+  document.getElementById("breakdown").textContent =
+    `Views: ${views.toLocaleString()} · CPM: ${money(cpm)} · Creator share: ${creatorPct.toFixed(1)}%`;
+
+}
+
+function resetAll(){
+
+  views.value = 100000;
+  cpm.value = 6.00;
+  creatorPct.value = 55;
+
+  calculate();
+
+}
+
+calcBtn.onclick = calculate;
+resetBtn.onclick = resetAll;
+
+yearNow.textContent = new Date().getFullYear();
+
+calculate();
+
+</script>
+
+</body>
+</html>
