@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>TikTok Money Calculator — Estimate Earnings From Views | CalcStack</title>
+  <meta name="description" content="Free TikTok money calculator. Estimate earnings from views using RPM ranges, plus optional brand deals, affiliate income, gifts, and other revenue streams.">
+
+  <link rel="canonical" href="https://calcstack.tools/tiktok-money-calculator">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+
+<body class="page">
+  <div class="container">
+
+    <h1 style="margin-bottom:8px;">TikTok Money Calculator</h1>
+
+    <p class="subtitle" style="max-width:900px;margin:0 auto 18px;">
+      Estimate TikTok earnings from views using an RPM range, plus optional brand deals, affiliate income, and gifts.
+    </p>
+
+    <div class="card" style="max-width:920px;margin:0 auto;">
+
+      <h2 style="margin:0 0 8px;">1) Earnings from views</h2>
+
+      <div class="row">
+        <div>
+          <label for="views">Views (monthly)</label>
+          <input id="views" type="number" inputmode="numeric" min="0" step="1" value="1000000" placeholder="e.g. 500000">
+        </div>
+
+        <div>
+          <label for="rpm">RPM (£ per 1,000 views)</label>
+          <input id="rpm" type="number" inputmode="decimal" min="0" step="0.01" value="1.50" placeholder="e.g. 0.50">
+          <div class="muted" style="font-size:12px;margin-top:6px;">
+            RPM varies widely by region, niche, and program eligibility.
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="rpmLow">Low RPM (£)</label>
+          <input id="rpmLow" type="number" inputmode="decimal" min="0" step="0.01" value="0.30">
+        </div>
+
+        <div>
+          <label for="rpmHigh">High RPM (£)</label>
+          <input id="rpmHigh" type="number" inputmode="decimal" min="0" step="0.01" value="3.00">
+        </div>
+      </div>
+
+      <hr style="border:0;border-top:1px solid rgba(255,255,255,0.10);margin:18px 0;">
+
+      <h2 style="margin:0 0 8px;">2) Other monthly income (optional)</h2>
+
+      <div class="row">
+        <div>
+          <label for="brandDeals">Brand deals (£)</label>
+          <input id="brandDeals" type="number" inputmode="decimal" min="0" step="0.01" value="0" placeholder="e.g. 500">
+        </div>
+
+        <div>
+          <label for="affiliate">Affiliate income (£)</label>
+          <input id="affiliate" type="number" inputmode="decimal" min="0" step="0.01" value="0" placeholder="e.g. 250">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="gifts">Gifts / tips (£)</label>
+          <input id="gifts" type="number" inputmode="decimal" min="0" step="0.01" value="0" placeholder="e.g. 100">
+        </div>
+
+        <div>
+          <label for="other">Other income (£)</label>
+          <input id="other" type="number" inputmode="decimal" min="0" step="0.01" value="0" placeholder="e.g. 200">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="fees">Fees (%) <span class="hint">(optional)</span></label>
+          <input id="fees" type="number" inputmode="decimal" min="0" max="100" step="0.1" value="0" placeholder="e.g. 10">
+          <div class="muted" style="font-size:12px;margin-top:6px;">
+            Use this if you want to estimate platform/processing fees across income.
+          </div>
+        </div>
+
+        <div>
+          <label for="expenses">Monthly expenses (£) <span class="hint">(optional)</span></label>
+          <input id="expenses" type="number" inputmode="decimal" min="0" step="0.01" value="0" placeholder="e.g. 150">
+        </div>
+      </div>
+
+      <div class="actions" style="align-items:center;">
+        <button id="calcBtn" type="button">Calculate</button>
+        <button class="secondary" id="resetBtn" type="button">Reset</button>
+        <a href="/" style="margin-left:6px;">Back to all tools</a>
+      </div>
+
+      <div class="results" style="margin-top:16px;">
+        <div class="kpi">
+
+          <div class="kpiBox">
+            <div class="label">Monthly (low)</div>
+            <div class="value" id="lowOut">—</div>
+            <div class="muted">Low RPM estimate</div>
+          </div>
+
+          <div class="kpiBox">
+            <div class="label">Monthly (mid)</div>
+            <div class="value" id="midOut">—</div>
+            <div class="muted">Mid RPM estimate</div>
+          </div>
+
+          <div class="kpiBox">
+            <div class="label">Monthly (high)</div>
+            <div class="value" id="highOut">—</div>
+            <div class="muted">High RPM estimate</div>
+          </div>
+
+          <div class="kpiBox">
+            <div class="label">Yearly (mid)</div>
+            <div class="value" id="yearOut">—</div>
+            <div class="muted">Mid × 12</div>
+          </div>
+
+        </div>
+
+        <div class="muted" id="breakdown" style="margin-top:10px;"></div>
+      </div>
+
+      <div class="muted" style="margin-top:12px;font-size:12px;line-height:1.4;">
+        Note: TikTok earnings vary dramatically by eligibility, region, niche, and monetization program. This calculator provides estimates only.
+      </div>
+
+    </div>
+
+    <div class="footer">© <span id="yearNow"></span> CalcStack.tools</div>
+
+  </div>
+
+<script>
+  const moneyGBP = (n) => {
+    const v = Number.isFinite(n) ? n : 0;
+    return new Intl.NumberFormat(undefined, { style: "currency", currency: "GBP" }).format(v);
+  };
+
+  const getVal = (id) => {
+    const v = parseFloat(document.getElementById(id).value);
+    return Number.isFinite(v) ? v : 0;
+  };
+
+  function viewsEarnings(views, rpm){
+    // rpm is £ per 1,000 views
+    return (views / 1000) * rpm;
+  }
+
+  function calculate(){
+    const views = Math.max(0, getVal("views"));
+
+    const rpmMid = Math.max(0, getVal("rpm"));
+    const rpmLow = Math.max(0, getVal("rpmLow"));
+    const rpmHigh = Math.max(0, getVal("rpmHigh"));
+
+    const brandDeals = Math.max(0, getVal("brandDeals"));
+    const affiliate = Math.max(0, getVal("affiliate"));
+    const gifts = Math.max(0, getVal("gifts"));
+    const other = Math.max(0, getVal("other"));
+
+    const feePct = Math.min(100, Math.max(0, getVal("fees")));
+    const expenses = Math.max(0, getVal("expenses"));
+
+    const otherIncome = brandDeals + affiliate + gifts + other;
+
+    const lowGross = viewsEarnings(views, rpmLow) + otherIncome;
+    const midGross = viewsEarnings(views, rpmMid) + otherIncome;
+    const highGross = viewsEarnings(views, rpmHigh) + otherIncome;
+
+    const lowFee = lowGross * (feePct / 100);
+    const midFee = midGross * (feePct / 100);
+    const highFee = highGross * (feePct / 100);
+
+    const lowNet = Math.max(0, lowGross - lowFee - expenses);
+    const midNet = Math.max(0, midGross - midFee - expenses);
+    const highNet = Math.max(0, highGross - highFee - expenses);
+
+    document.getElementById("lowOut").textContent = moneyGBP(lowNet);
+    document.getElementById("midOut").textContent = moneyGBP(midNet);
+    document.getElementById("highOut").textContent = moneyGBP(highNet);
+    document.getElementById("yearOut").textContent = moneyGBP(midNet * 12);
+
+    document.getElementById("breakdown").textContent =
+      `Views: ${views.toLocaleString()} · RPM (low/mid/high): £${rpmLow.toFixed(2)}/£${rpmMid.toFixed(2)}/£${rpmHigh.toFixed(2)} · ` +
+      `Other income: ${moneyGBP(otherIncome)} · Fees: ${feePct.toFixed(1)}% · Expenses: ${moneyGBP(expenses)}`;
+  }
+
+  function resetAll(){
+    document.getElementById("views").value = 1000000;
+    document.getElementById("rpm").value = 1.50;
+    document.getElementById("rpmLow").value = 0.30;
+    document.getElementById("rpmHigh").value = 3.00;
+
+    document.getElementById("brandDeals").value = 0;
+    document.getElementById("affiliate").value = 0;
+    document.getElementById("gifts").value = 0;
+    document.getElementById("other").value = 0;
+
+    document.getElementById("fees").value = 0;
+    document.getElementById("expenses").value = 0;
+
+    calculate();
+  }
+
+  document.getElementById("calcBtn").addEventListener("click", calculate);
+  document.getElementById("resetBtn").addEventListener("click", resetAll);
+
+  ["views","rpm","rpmLow","rpmHigh","brandDeals","affiliate","gifts","other","fees","expenses"].forEach(id => {
+    document.getElementById(id).addEventListener("input", calculate);
+    document.getElementById(id).addEventListener("keydown", (e) => {
+      if(e.key === "Enter") calculate();
+    });
+  });
+
+  document.getElementById("yearNow").textContent = new Date().getFullYear();
+  calculate();
+</script>
+
+</body>
+</html>
