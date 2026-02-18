@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Percentage Calculator — Percent of, Increase & Decrease | CalcStack</title>
-  <meta name="description" content="Free percentage calculator. Calculate percent of a number, percentage increase, and percentage decrease instantly.">
+  <title>Percentage Calculator — Percent of, What Percent & % Change | CalcStack</title>
+  <meta name="description" content="Free percentage calculator. Calculate X% of Y, what percent X is of Y, and percentage change (increase/decrease) instantly.">
 
   <link rel="canonical" href="https://calcstack.tools/percentage-calculator">
   <link rel="stylesheet" href="/css/styles.css">
@@ -17,7 +17,7 @@
     <h1 style="margin-bottom:8px;">Percentage Calculator</h1>
 
     <p class="subtitle" style="max-width:760px;margin:0 auto 18px;">
-      Calculate percent of a number, percentage increase, and percentage decrease.
+      Calculate percent of a number, what percent one number is of another, and percentage change.
     </p>
 
     <div class="card" style="max-width:920px;margin:0 auto;">
@@ -48,8 +48,35 @@
 
       <hr style="border:0;border-top:1px solid rgba(255,255,255,0.10);margin:18px 0;">
 
-      <!-- 2) Percent change -->
-      <h2 style="margin:0 0 8px;">2) Percentage change</h2>
+      <!-- 2) What percent -->
+      <h2 style="margin:0 0 8px;">2) X is what % of Y?</h2>
+
+      <div class="row">
+        <div>
+          <label for="p2x">X</label>
+          <input id="p2x" type="number" inputmode="decimal" step="0.01" value="50">
+        </div>
+        <div>
+          <label for="p2y">Y</label>
+          <input id="p2y" type="number" inputmode="decimal" step="0.01" value="200">
+        </div>
+      </div>
+
+      <div class="results" style="margin-top:12px;">
+        <div class="kpi">
+          <div class="kpiBox">
+            <div class="label">Percent</div>
+            <div class="value" id="p2out">—</div>
+            <div class="muted">X ÷ Y × 100</div>
+          </div>
+        </div>
+        <div class="muted" id="p2note" style="margin-top:10px;"></div>
+      </div>
+
+      <hr style="border:0;border-top:1px solid rgba(255,255,255,0.10);margin:18px 0;">
+
+      <!-- 3) Percent change -->
+      <h2 style="margin:0 0 8px;">3) Percentage change</h2>
 
       <div class="row">
         <div>
@@ -67,7 +94,7 @@
           <div class="kpiBox">
             <div class="label">Change</div>
             <div class="value" id="chgOut">—</div>
-            <div class="muted">Increase or decrease (%)</div>
+            <div class="muted" id="chgLabel">Increase or decrease (%)</div>
           </div>
           <div class="kpiBox">
             <div class="label">Difference</div>
@@ -75,7 +102,7 @@
             <div class="muted">New − Old</div>
           </div>
         </div>
-        <div class="muted breakdown" id="breakdown"></div>
+        <div class="muted" id="breakdown" style="margin-top:10px;"></div>
       </div>
 
       <div class="actions" style="align-items:center;">
@@ -85,7 +112,10 @@
       </div>
 
       <div class="muted" style="margin-top:12px;font-size:12px;line-height:1.4;">
-        Formulas: X% of Y = (X ÷ 100) × Y · % Change = ((New − Old) ÷ Old) × 100
+        Formulas:
+        X% of Y = (X ÷ 100) × Y ·
+        X is what % of Y = (X ÷ Y) × 100 ·
+        % Change = ((New − Old) ÷ Old) × 100
       </div>
 
     </div>
@@ -100,7 +130,7 @@
     return new Intl.NumberFormat(undefined, { maximumFractionDigits: 6 }).format(v);
   };
 
-  const pct = (n) => (Number.isFinite(n) ? n : 0).toFixed(2) + "%";
+  const pct2 = (n) => (Number.isFinite(n) ? n : 0).toFixed(2) + "%";
 
   const getVal = (id) => {
     const v = parseFloat(document.getElementById(id).value);
@@ -109,41 +139,74 @@
 
   function calculate(){
     // 1) Percent of
-    const x = getVal("p1x");
-    const y = getVal("p1y");
-    const pOf = (x / 100) * y;
-
+    const p1x = getVal("p1x");
+    const p1y = getVal("p1y");
+    const pOf = (p1x / 100) * p1y;
     document.getElementById("p1out").textContent = fmtNumber(pOf);
 
-    // 2) Percent change
+    // 2) What percent
+    const p2x = getVal("p2x");
+    const p2y = getVal("p2y");
+
+    if (p2y === 0) {
+      document.getElementById("p2out").textContent = "—";
+      document.getElementById("p2note").textContent = "Y is 0, so the percent is undefined.";
+    } else {
+      const whatPct = (p2x / p2y) * 100;
+      document.getElementById("p2out").textContent = pct2(whatPct);
+      document.getElementById("p2note").textContent = `${fmtNumber(p2x)} is ${pct2(whatPct)} of ${fmtNumber(p2y)}.`;
+    }
+
+    // 3) Percent change
     const oldV = getVal("oldVal");
     const newV = getVal("newVal");
-
     const diff = newV - oldV;
 
-    let change = 0;
-    if (oldV !== 0) change = (diff / oldV) * 100;
+    const chgLabel = document.getElementById("chgLabel");
+    const chgOut = document.getElementById("chgOut");
+    const diffOut = document.getElementById("diffOut");
+    const breakdown = document.getElementById("breakdown");
+
+    diffOut.textContent = fmtNumber(diff);
+
+    if (oldV === 0) {
+      chgOut.textContent = "—";
+      chgLabel.textContent = "Undefined when Old = 0";
+      breakdown.textContent = `Old: ${fmtNumber(oldV)} · New: ${fmtNumber(newV)} · Difference: ${fmtNumber(diff)} · Change: —`;
+      return;
+    }
+
+    const change = (diff / oldV) * 100;
+
+    let direction = "No change";
+    if (change > 0) direction = "Increase";
+    if (change < 0) direction = "Decrease";
 
     const sign = change > 0 ? "+" : "";
-    document.getElementById("chgOut").textContent = sign + pct(change);
-    document.getElementById("diffOut").textContent = fmtNumber(diff);
+    chgOut.textContent = sign + pct2(change);
+    chgLabel.textContent = `${direction} (%)`;
 
-    document.getElementById("breakdown").textContent =
-      `Old: ${fmtNumber(oldV)} · New: ${fmtNumber(newV)} · Difference: ${fmtNumber(diff)} · Change: ${sign}${pct(change)}`;
+    breakdown.textContent =
+      `Old: ${fmtNumber(oldV)} · New: ${fmtNumber(newV)} · Difference: ${fmtNumber(diff)} · Change: ${sign}${pct2(change)}`;
   }
 
   function resetAll(){
     document.getElementById("p1x").value = 20;
     document.getElementById("p1y").value = 250;
+
+    document.getElementById("p2x").value = 50;
+    document.getElementById("p2y").value = 200;
+
     document.getElementById("oldVal").value = 100;
     document.getElementById("newVal").value = 125;
+
     calculate();
   }
 
   document.getElementById("calcBtn").addEventListener("click", calculate);
   document.getElementById("resetBtn").addEventListener("click", resetAll);
 
-  ["p1x","p1y","oldVal","newVal"].forEach(id => {
+  ["p1x","p1y","p2x","p2y","oldVal","newVal"].forEach(id => {
     document.getElementById(id).addEventListener("input", calculate);
     document.getElementById(id).addEventListener("keydown", (e) => {
       if(e.key === "Enter") calculate();
