@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Salary to Hourly Calculator (UK) — Convert Annual Salary | CalcStack</title>
+  <meta name="description" content="Free salary to hourly calculator. Convert annual salary into hourly wage based on hours per week and work weeks per year.">
+
+  <link rel="canonical" href="https://calcstack.tools/salary-to-hourly-calculator">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+
+<body class="page">
+  <div class="container">
+
+    <h1 style="margin-bottom:8px;">Salary to Hourly Calculator</h1>
+
+    <p class="subtitle" style="max-width:860px;margin:0 auto 18px;">
+      Convert annual salary into hourly pay based on your weekly hours and working weeks per year.
+    </p>
+
+    <div class="card" style="max-width:920px;margin:0 auto;">
+
+      <div class="row">
+        <div>
+          <label for="salary">Annual salary (£)</label>
+          <input id="salary" type="number" value="30000" min="0" step="0.01">
+        </div>
+
+        <div>
+          <label for="hours">Hours per week</label>
+          <input id="hours" type="number" value="40" min="0" step="0.1">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="weeks">Working weeks per year</label>
+          <input id="weeks" type="number" value="52" min="0" step="1">
+        </div>
+      </div>
+
+      <div class="actions">
+        <button id="calcBtn">Calculate</button>
+        <button class="secondary" id="resetBtn">Reset</button>
+        <a href="/" style="margin-left:6px;">Back to all tools</a>
+      </div>
+
+      <div class="results">
+
+        <div class="kpi">
+
+          <div class="kpiBox">
+            <div class="label">Hourly rate</div>
+            <div class="value" id="hourlyOut">—</div>
+            <div class="muted">Per hour</div>
+          </div>
+
+          <div class="kpiBox">
+            <div class="label">Daily pay</div>
+            <div class="value" id="dailyOut">—</div>
+            <div class="muted">Based on hours per week</div>
+          </div>
+
+          <div class="kpiBox">
+            <div class="label">Weekly pay</div>
+            <div class="value" id="weeklyOut">—</div>
+            <div class="muted">Salary ÷ weeks</div>
+          </div>
+
+          <div class="kpiBox">
+            <div class="label">Monthly pay</div>
+            <div class="value" id="monthlyOut">—</div>
+            <div class="muted">Salary ÷ 12</div>
+          </div>
+
+        </div>
+
+        <div class="muted" id="breakdown" style="margin-top:10px;"></div>
+
+      </div>
+
+      <div class="muted" style="margin-top:12px;font-size:12px;">
+        Results are estimates based on your input. Actual pay may vary depending on contract and overtime.
+      </div>
+
+      <!-- RELATED CALCULATORS -->
+      <hr style="border:0;border-top:1px solid rgba(255,255,255,0.10);margin:18px 0;">
+
+      <div class="muted" style="font-size:13px;line-height:1.6;">
+        Related calculators:
+        <a href="/percentage-calculator">Percentage Calculator</a> ·
+        <a href="/vat-calculator">VAT Calculator</a> ·
+        <a href="/loan-calculator">Loan Calculator</a> ·
+        <a href="/compound-interest-calculator">Compound Interest Calculator</a>
+      </div>
+
+    </div>
+
+    <div class="footer">
+      © <span id="yearNow"></span> CalcStack.tools
+    </div>
+
+  </div>
+
+<script>
+
+const money = n =>
+  new Intl.NumberFormat(undefined,{
+    style:"currency",
+    currency:"GBP"
+  }).format(n);
+
+const getVal = id =>
+  parseFloat(document.getElementById(id).value) || 0;
+
+function calculate(){
+
+  const salary = getVal("salary");
+  const hours = getVal("hours");
+  const weeks = getVal("weeks");
+
+  const hourly = salary / (hours * weeks);
+  const weekly = salary / weeks;
+  const monthly = salary / 12;
+  const daily = weekly / (hours / 5);
+
+  hourlyOut.textContent = money(hourly);
+  weeklyOut.textContent = money(weekly);
+  monthlyOut.textContent = money(monthly);
+  dailyOut.textContent = money(daily);
+
+  breakdown.textContent =
+    `Salary: ${money(salary)} · Hours/week: ${hours} · Weeks/year: ${weeks}`;
+
+}
+
+function resetAll(){
+
+  salary.value = 30000;
+  hours.value = 40;
+  weeks.value = 52;
+
+  calculate();
+
+}
+
+calcBtn.onclick = calculate;
+resetBtn.onclick = resetAll;
+
+yearNow.textContent = new Date().getFullYear();
+
+calculate();
+
+</script>
+
+</body>
+</html>
