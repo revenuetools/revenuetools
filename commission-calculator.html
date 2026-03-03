@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>Commission Calculator — Percentage, Flat Fee & Net Earnings | CalcStack</title>
-  <meta name="description" content="Free commission calculator. Calculate commission from a percentage, flat fee, or both. Estimate net earnings after platform fees and expenses.">
+  <meta name="description" content="Free commission calculator. Calculate commission from a percentage, flat fee, or both. Estimate net earnings after platform fees and expenses. Supports multiple currencies.">
 
   <link rel="canonical" href="https://calcstack.tools/commission-calculator">
   <link rel="stylesheet" href="/css/styles.css">
@@ -24,36 +24,54 @@
 
       <div class="row">
         <div>
-          <label for="sale">Sale amount / deal value (£)</label>
-          <input id="sale" type="number" inputmode="decimal" min="0" step="0.01" value="1000" placeholder="e.g. 2500">
+          <label for="currency">Currency</label>
+          <select id="currency">
+            <option value="GBP">GBP — British Pound (£)</option>
+            <option value="USD">USD — US Dollar ($)</option>
+            <option value="EUR">EUR — Euro (€)</option>
+            <option value="CAD">CAD — Canadian Dollar (CA$)</option>
+            <option value="AUD">AUD — Australian Dollar (A$)</option>
+            <option value="INR">INR — Indian Rupee (₹)</option>
+            <option value="BRL">BRL — Brazilian Real (R$)</option>
+            <option value="MXN">MXN — Mexican Peso (MX$)</option>
+            <option value="SGD">SGD — Singapore Dollar (S$)</option>
+            <option value="NZD">NZD — New Zealand Dollar (NZ$)</option>
+          </select>
         </div>
 
+        <div>
+          <label for="sale">Sale amount / deal value</label>
+          <input id="sale" type="number" inputmode="decimal" min="0" step="0.01" value="1000" placeholder="e.g. 2500">
+        </div>
+      </div>
+
+      <div class="row">
         <div>
           <label for="rate">Commission rate (%)</label>
           <input id="rate" type="number" inputmode="decimal" min="0" step="0.01" value="10" placeholder="e.g. 12.5">
         </div>
-      </div>
 
-      <div class="row">
         <div>
-          <label for="flat">Flat commission (£) <span class="hint">optional</span></label>
+          <label for="flat">Flat commission <span class="hint">optional</span></label>
           <input id="flat" type="number" inputmode="decimal" min="0" step="0.01" value="0" placeholder="e.g. 50">
         </div>
-
-        <div>
-          <label for="cap">Commission cap (£) <span class="hint">optional</span></label>
-          <input id="cap" type="number" inputmode="decimal" min="0" step="0.01" value="0" placeholder="e.g. 200">
-        </div>
       </div>
 
       <div class="row">
+        <div>
+          <label for="cap">Commission cap <span class="hint">optional</span></label>
+          <input id="cap" type="number" inputmode="decimal" min="0" step="0.01" value="0" placeholder="e.g. 200">
+        </div>
+
         <div>
           <label for="platformFee">Platform fee (%) <span class="hint">optional</span></label>
           <input id="platformFee" type="number" inputmode="decimal" min="0" max="100" step="0.1" value="0" placeholder="e.g. 20">
         </div>
+      </div>
 
+      <div class="row">
         <div>
-          <label for="expenses">Expenses (£) <span class="hint">optional</span></label>
+          <label for="expenses">Expenses <span class="hint">optional</span></label>
           <input id="expenses" type="number" inputmode="decimal" min="0" step="0.01" value="0" placeholder="e.g. 15">
         </div>
       </div>
@@ -97,7 +115,7 @@
       </div>
 
       <div class="muted" style="margin-top:12px;font-size:12px;line-height:1.4;">
-        Tip: Set a platform fee if you’re calculating commissions on marketplaces or creator platforms.
+        Tip: Set a platform fee if you're calculating commissions on marketplaces or creator platforms.
       </div>
 
     </div>
@@ -107,9 +125,14 @@
   </div>
 
 <script>
-  const moneyGBP = (n) => {
+  const money = (n) => {
+    const cur = document.getElementById("currency").value || "GBP";
     const v = Number.isFinite(n) ? n : 0;
-    return new Intl.NumberFormat(undefined, { style: "currency", currency: "GBP" }).format(v);
+    try {
+      return new Intl.NumberFormat(undefined, { style: "currency", currency: cur }).format(v);
+    } catch {
+      return v.toFixed(2) + " " + cur;
+    }
   };
 
   const pct = (n) => (Number.isFinite(n) ? n : 0).toFixed(2) + "%";
@@ -120,50 +143,50 @@
   };
 
   function calculate(){
-    const sale = Math.max(0, getVal("sale"));
-    const rate = Math.max(0, getVal("rate"));
-    const flat = Math.max(0, getVal("flat"));
-    const cap = Math.max(0, getVal("cap"));
+    const sale           = Math.max(0, getVal("sale"));
+    const rate           = Math.max(0, getVal("rate"));
+    const flat           = Math.max(0, getVal("flat"));
+    const cap            = Math.max(0, getVal("cap"));
     const platformFeePct = Math.min(100, Math.max(0, getVal("platformFee")));
-    const expenses = Math.max(0, getVal("expenses"));
+    const expenses       = Math.max(0, getVal("expenses"));
 
     const percentCommission = sale * (rate / 100);
     let commission = percentCommission + flat;
-
     if (cap > 0) commission = Math.min(commission, cap);
 
-    const fee = commission * (platformFeePct / 100);
-    const net = Math.max(0, commission - fee - expenses);
-
+    const fee    = commission * (platformFeePct / 100);
+    const net    = Math.max(0, commission - fee - expenses);
     const effRate = sale > 0 ? (net / sale) * 100 : 0;
 
-    document.getElementById("commissionOut").textContent = moneyGBP(commission);
-    document.getElementById("feeOut").textContent = moneyGBP(fee);
-    document.getElementById("netOut").textContent = moneyGBP(net);
-    document.getElementById("effRateOut").textContent = pct(effRate);
+    document.getElementById("commissionOut").textContent = money(commission);
+    document.getElementById("feeOut").textContent        = money(fee);
+    document.getElementById("netOut").textContent        = money(net);
+    document.getElementById("effRateOut").textContent    = pct(effRate);
 
     document.getElementById("breakdown").textContent =
-      `Sale: ${moneyGBP(sale)} · Rate: ${rate.toFixed(2)}% (${moneyGBP(percentCommission)}) · ` +
-      `Flat: ${moneyGBP(flat)} · Cap: ${cap > 0 ? moneyGBP(cap) : "—"} · ` +
-      `Commission: ${moneyGBP(commission)} · Platform fee: ${platformFeePct.toFixed(1)}% (${moneyGBP(fee)}) · ` +
-      `Expenses: ${moneyGBP(expenses)} · Net: ${moneyGBP(net)} · Effective: ${pct(effRate)}`;
+      `Sale: ${money(sale)} · Rate: ${rate.toFixed(2)}% (${money(percentCommission)}) · ` +
+      `Flat: ${money(flat)} · Cap: ${cap > 0 ? money(cap) : "—"} · ` +
+      `Commission: ${money(commission)} · Platform fee: ${platformFeePct.toFixed(1)}% (${money(fee)}) · ` +
+      `Expenses: ${money(expenses)} · Net: ${money(net)} · Effective: ${pct(effRate)}`;
   }
 
   function resetAll(){
-    document.getElementById("sale").value = 1000;
-    document.getElementById("rate").value = 10;
-    document.getElementById("flat").value = 0;
-    document.getElementById("cap").value = 0;
+    document.getElementById("currency").value    = "GBP";
+    document.getElementById("sale").value        = 1000;
+    document.getElementById("rate").value        = 10;
+    document.getElementById("flat").value        = 0;
+    document.getElementById("cap").value         = 0;
     document.getElementById("platformFee").value = 0;
-    document.getElementById("expenses").value = 0;
+    document.getElementById("expenses").value    = 0;
     calculate();
   }
 
   document.getElementById("calcBtn").addEventListener("click", calculate);
   document.getElementById("resetBtn").addEventListener("click", resetAll);
 
-  ["sale","rate","flat","cap","platformFee","expenses"].forEach(id => {
+  ["currency","sale","rate","flat","cap","platformFee","expenses"].forEach(id => {
     document.getElementById(id).addEventListener("input", calculate);
+    document.getElementById(id).addEventListener("change", calculate);
     document.getElementById(id).addEventListener("keydown", (e) => {
       if(e.key === "Enter") calculate();
     });
