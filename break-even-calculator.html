@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>Break-Even Calculator — Units & Revenue Needed | CalcStack</title>
-  <meta name="description" content="Free break-even calculator. Calculate how many units you need to sell to break even, plus revenue needed, profit per unit, and margin.">
+  <meta name="description" content="Free break-even calculator. Calculate how many units you need to sell to break even, plus revenue needed, profit per unit, and margin. Supports multiple currencies.">
 
   <link rel="canonical" href="https://calcstack.tools/break-even-calculator">
   <link rel="stylesheet" href="/css/styles.css">
@@ -24,24 +24,50 @@
 
       <div class="row">
         <div>
-          <label for="fixedCosts">Fixed costs (£)</label>
+          <label for="currency">Currency</label>
+          <select id="currency">
+            <option value="GBP">GBP — British Pound (£)</option>
+            <option value="USD">USD — US Dollar ($)</option>
+            <option value="EUR">EUR — Euro (€)</option>
+            <option value="CAD">CAD — Canadian Dollar (CA$)</option>
+            <option value="AUD">AUD — Australian Dollar (A$)</option>
+            <option value="INR">INR — Indian Rupee (₹)</option>
+            <option value="BRL">BRL — Brazilian Real (R$)</option>
+            <option value="MXN">MXN — Mexican Peso (MX$)</option>
+            <option value="SGD">SGD — Singapore Dollar (S$)</option>
+            <option value="NZD">NZD — New Zealand Dollar (NZ$)</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="period">Cost period</label>
+          <select id="period">
+            <option value="monthly">Monthly</option>
+            <option value="yearly">Yearly</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="fixedCosts">Fixed costs</label>
           <input id="fixedCosts" type="number" inputmode="decimal" min="0" step="0.01" value="1000">
         </div>
 
         <div>
-          <label for="price">Price per unit (£)</label>
+          <label for="price">Price per unit</label>
           <input id="price" type="number" inputmode="decimal" min="0" step="0.01" value="25">
         </div>
       </div>
 
       <div class="row">
         <div>
-          <label for="variableCost">Variable cost per unit (£)</label>
+          <label for="variableCost">Variable cost per unit</label>
           <input id="variableCost" type="number" inputmode="decimal" min="0" step="0.01" value="10">
         </div>
 
         <div>
-          <label for="targetProfit">Target profit (£) <span class="hint">optional</span></label>
+          <label for="targetProfit">Target profit <span class="hint">optional</span></label>
           <input id="targetProfit" type="number" inputmode="decimal" min="0" step="0.01" value="0" placeholder="e.g. 500">
         </div>
       </div>
@@ -85,7 +111,7 @@
       </div>
 
       <div class="muted" style="margin-top:12px;font-size:12px;line-height:1.4;">
-        Note: If variable cost is equal to or higher than price, break-even isn’t possible with these values.
+        Note: If variable cost is equal to or higher than price, break-even isn't possible with these values.
       </div>
 
     </div>
@@ -95,9 +121,14 @@
   </div>
 
 <script>
-  const moneyGBP = (n) => {
+  const money = (n) => {
+    const cur = document.getElementById("currency").value || "GBP";
     const v = Number.isFinite(n) ? n : 0;
-    return new Intl.NumberFormat(undefined, { style: "currency", currency: "GBP" }).format(v);
+    try {
+      return new Intl.NumberFormat(undefined, { style: "currency", currency: cur }).format(v);
+    } catch {
+      return v.toFixed(2) + " " + cur;
+    }
   };
 
   const pct = (n) => (Number.isFinite(n) ? n : 0).toFixed(2) + "%";
@@ -108,46 +139,49 @@
   };
 
   function calculate(){
-    const fixed = Math.max(0, getVal("fixedCosts"));
-    const price = Math.max(0, getVal("price"));
-    const variable = Math.max(0, getVal("variableCost"));
+    const fixed        = Math.max(0, getVal("fixedCosts"));
+    const price        = Math.max(0, getVal("price"));
+    const variable     = Math.max(0, getVal("variableCost"));
     const targetProfit = Math.max(0, getVal("targetProfit"));
+    const period       = document.getElementById("period").value;
 
-    const profitPerUnit = price - variable;
-    const totalToCover = fixed + targetProfit;
+    const profitPerUnit  = price - variable;
+    const totalToCover   = fixed + targetProfit;
 
     let units = Infinity;
     if (profitPerUnit > 0) units = totalToCover / profitPerUnit;
 
     const unitsRounded = Number.isFinite(units) ? Math.ceil(units) : Infinity;
-    const revenue = Number.isFinite(unitsRounded) ? unitsRounded * price : 0;
+    const revenue      = Number.isFinite(unitsRounded) ? unitsRounded * price : 0;
 
     let margin = 0;
     if (price > 0) margin = (profitPerUnit / price) * 100;
 
-    document.getElementById("ppu").textContent = moneyGBP(profitPerUnit);
+    document.getElementById("ppu").textContent    = money(profitPerUnit);
     document.getElementById("margin").textContent = pct(margin);
 
     if (!Number.isFinite(unitsRounded)) {
-      document.getElementById("units").textContent = "—";
+      document.getElementById("units").textContent         = "—";
       document.getElementById("revenueNeeded").textContent = "—";
-      document.getElementById("breakdown").textContent =
-        `Your variable cost is greater than or equal to your price, so break-even isn’t possible with these numbers.`;
+      document.getElementById("breakdown").textContent     =
+        `Your variable cost is greater than or equal to your price, so break-even isn't possible with these numbers.`;
       return;
     }
 
-    document.getElementById("units").textContent = unitsRounded.toLocaleString();
-    document.getElementById("revenueNeeded").textContent = moneyGBP(revenue);
+    document.getElementById("units").textContent         = unitsRounded.toLocaleString();
+    document.getElementById("revenueNeeded").textContent = money(revenue);
 
     document.getElementById("breakdown").textContent =
-      `Fixed costs: ${moneyGBP(fixed)} · Target profit: ${moneyGBP(targetProfit)} · ` +
-      `Profit/unit: ${moneyGBP(profitPerUnit)} · Break-even units: ${unitsRounded.toLocaleString()} · ` +
-      `Revenue needed: ${moneyGBP(revenue)} · Margin: ${pct(margin)}`;
+      `Period: ${period} · Fixed costs: ${money(fixed)} · Target profit: ${money(targetProfit)} · ` +
+      `Profit/unit: ${money(profitPerUnit)} · Break-even units: ${unitsRounded.toLocaleString()} · ` +
+      `Revenue needed: ${money(revenue)} · Margin: ${pct(margin)}`;
   }
 
   function resetAll(){
-    document.getElementById("fixedCosts").value = 1000;
-    document.getElementById("price").value = 25;
+    document.getElementById("currency").value     = "GBP";
+    document.getElementById("period").value       = "monthly";
+    document.getElementById("fixedCosts").value   = 1000;
+    document.getElementById("price").value        = 25;
     document.getElementById("variableCost").value = 10;
     document.getElementById("targetProfit").value = 0;
     calculate();
@@ -156,8 +190,9 @@
   document.getElementById("calcBtn").addEventListener("click", calculate);
   document.getElementById("resetBtn").addEventListener("click", resetAll);
 
-  ["fixedCosts","price","variableCost","targetProfit"].forEach(id => {
+  ["currency","period","fixedCosts","price","variableCost","targetProfit"].forEach(id => {
     document.getElementById(id).addEventListener("input", calculate);
+    document.getElementById(id).addEventListener("change", calculate);
     document.getElementById(id).addEventListener("keydown", (e) => {
       if(e.key === "Enter") calculate();
     });
