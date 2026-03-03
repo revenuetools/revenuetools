@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>Compound Interest Calculator — Investment Growth Over Time | CalcStack</title>
-  <meta name="description" content="Free compound interest calculator. Calculate investment growth, interest earned, and final value with compound interest and monthly contributions.">
+  <meta name="description" content="Free compound interest calculator. Calculate investment growth, interest earned, and final value with compound interest and monthly contributions. Supports multiple currencies.">
 
   <link rel="canonical" href="https://calcstack.tools/compound-interest-calculator">
   <link rel="stylesheet" href="/css/styles.css">
@@ -24,29 +24,45 @@
 
       <div class="row">
         <div>
-          <label for="principal">Starting amount (£)</label>
-          <input id="principal" type="number" value="1000" min="0" step="0.01">
+          <label for="currency">Currency</label>
+          <select id="currency">
+            <option value="GBP">GBP — British Pound (£)</option>
+            <option value="USD">USD — US Dollar ($)</option>
+            <option value="EUR">EUR — Euro (€)</option>
+            <option value="CAD">CAD — Canadian Dollar (CA$)</option>
+            <option value="AUD">AUD — Australian Dollar (A$)</option>
+            <option value="INR">INR — Indian Rupee (₹)</option>
+            <option value="BRL">BRL — Brazilian Real (R$)</option>
+            <option value="MXN">MXN — Mexican Peso (MX$)</option>
+            <option value="SGD">SGD — Singapore Dollar (S$)</option>
+            <option value="NZD">NZD — New Zealand Dollar (NZ$)</option>
+          </select>
         </div>
 
+        <div>
+          <label for="principal">Starting amount</label>
+          <input id="principal" type="number" value="1000" min="0" step="0.01">
+        </div>
+      </div>
+
+      <div class="row">
         <div>
           <label for="rate">Interest rate (% per year)</label>
           <input id="rate" type="number" value="5" min="0" step="0.01">
         </div>
-      </div>
 
-      <div class="row">
         <div>
           <label for="years">Time period (years)</label>
           <input id="years" type="number" value="10" min="0" step="1">
         </div>
-
-        <div>
-          <label for="contribution">Monthly contribution (£)</label>
-          <input id="contribution" type="number" value="100" min="0" step="0.01">
-        </div>
       </div>
 
       <div class="row">
+        <div>
+          <label for="contribution">Monthly contribution</label>
+          <input id="contribution" type="number" value="100" min="0" step="0.01">
+        </div>
+
         <div>
           <label for="compound">Compound frequency</label>
           <select id="compound">
@@ -102,12 +118,11 @@
         Compound interest allows your money to grow faster by earning interest on both your initial deposit and accumulated interest.
       </div>
 
-      <!-- RELATED CALCULATORS -->
       <hr style="border:0;border-top:1px solid rgba(255,255,255,0.10);margin:18px 0;">
 
       <div class="muted" style="font-size:13px;line-height:1.6;">
         Related calculators:
-        <a href="/savings-calculator">Savings Interest Calculator</a> ·
+        <a href="/savings-interest-calculator">Savings Interest Calculator</a> ·
         <a href="/loan-calculator">Loan Calculator</a> ·
         <a href="/percentage-calculator">Percentage Calculator</a> ·
         <a href="/profit-margin-calculator">Profit Margin Calculator</a>
@@ -122,65 +137,69 @@
   </div>
 
 <script>
+  const money = (n) => {
+    const cur = document.getElementById("currency").value || "GBP";
+    const v = Number.isFinite(n) ? n : 0;
+    try {
+      return new Intl.NumberFormat(undefined, { style: "currency", currency: cur }).format(v);
+    } catch {
+      return v.toFixed(2) + " " + cur;
+    }
+  };
 
-const money = n =>
-  new Intl.NumberFormat(undefined,{
-    style:"currency",
-    currency:"GBP"
-  }).format(n);
+  const getVal = (id) => parseFloat(document.getElementById(id).value) || 0;
 
-const getVal = id =>
-  parseFloat(document.getElementById(id).value) || 0;
+  function calculate() {
+    const P   = getVal("principal");
+    const r   = getVal("rate") / 100;
+    const t   = getVal("years");
+    const PMT = getVal("contribution");
+    const n   = getVal("compound");
 
-function calculate(){
+    let value = P;
+    const totalMonths = t * 12;
 
-  const P = getVal("principal");
-  const r = getVal("rate") / 100;
-  const t = getVal("years");
-  const PMT = getVal("contribution");
-  const n = getVal("compound");
+    for (let m = 0; m < totalMonths; m++) {
+      value += PMT;
+      value *= (1 + r / n);
+    }
 
-  let value = P;
-  const totalMonths = t * 12;
+    const contributions = P + (PMT * totalMonths);
+    const interest      = value - contributions;
+    const multiplier    = P > 0 ? (value / P).toFixed(2) : "—";
 
-  for(let m=0; m<totalMonths; m++){
-    value += PMT;
-    value *= (1 + r/n);
+    document.getElementById("finalOut").textContent      = money(value);
+    document.getElementById("interestOut").textContent   = money(interest);
+    document.getElementById("contribOut").textContent    = money(contributions);
+    document.getElementById("multiplierOut").textContent = multiplier + "×";
+
+    document.getElementById("breakdown").textContent =
+      `Start: ${money(P)} · Rate: ${(r * 100).toFixed(2)}% · Years: ${t} · Monthly deposit: ${money(PMT)}`;
   }
 
-  const contributions = P + (PMT * totalMonths);
-  const interest = value - contributions;
-  const multiplier = P > 0 ? (value / P).toFixed(2) : "—";
+  function resetAll() {
+    document.getElementById("currency").value     = "GBP";
+    document.getElementById("principal").value    = 1000;
+    document.getElementById("rate").value         = 5;
+    document.getElementById("years").value        = 10;
+    document.getElementById("contribution").value = 100;
+    document.getElementById("compound").value     = 12;
+    calculate();
+  }
 
-  finalOut.textContent = money(value);
-  interestOut.textContent = money(interest);
-  contribOut.textContent = money(contributions);
-  multiplierOut.textContent = multiplier + "×";
+  document.getElementById("calcBtn").addEventListener("click", calculate);
+  document.getElementById("resetBtn").addEventListener("click", resetAll);
 
-  breakdown.textContent =
-    `Start: ${money(P)} · Rate: ${(r*100).toFixed(2)}% · Years: ${t} · Monthly deposit: ${money(PMT)}`;
+  ["currency","principal","rate","years","contribution","compound"].forEach(id => {
+    document.getElementById(id).addEventListener("input", calculate);
+    document.getElementById(id).addEventListener("change", calculate);
+    document.getElementById(id).addEventListener("keydown", (e) => {
+      if (e.key === "Enter") calculate();
+    });
+  });
 
-}
-
-function resetAll(){
-
-  principal.value = 1000;
-  rate.value = 5;
-  years.value = 10;
-  contribution.value = 100;
-  compound.value = 12;
-
+  document.getElementById("yearNow").textContent = new Date().getFullYear();
   calculate();
-
-}
-
-calcBtn.onclick = calculate;
-resetBtn.onclick = resetAll;
-
-yearNow.textContent = new Date().getFullYear();
-
-calculate();
-
 </script>
 
 </body>
