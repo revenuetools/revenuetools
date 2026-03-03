@@ -1,162 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-
-  <url>
-    <loc>https://calcstack.tools/</loc>
-    <lastmod>2026-01-18</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-  </url>
-
-  <url>
-    <loc>https://calcstack.tools/creator-earnings-calculator</loc>
-    <lastmod>2026-01-18</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-
-  <url>
-    <loc>https://calcstack.tools/roi-calculator</loc>
-    <lastmod>2026-01-18</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-
-  <url>
-    <loc>https://calcstack.tools/youtube-money-calculator</loc>
-    <lastmod>2026-01-18</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-
-  <url>
-    <loc>https://calcstack.tools/ad-revenue-calculator</loc>
-    <lastmod>2026-01-18</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-
-  <url>
-    <loc>https://calcstack.tools/cpm-calculator</loc>
-    <lastmod>2026-01-18</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://calcstack.tools/profit-margin-calculator</loc>
-    <lastmod>2026-01-18</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://calcstack.tools/break-even-calculator</loc>
-    <lastmod>2026-01-18</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://calcstack.tools/discount-calculator</loc>
-    <lastmod>2026-01-18</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://calcstack.tools/loan-calculator</loc>
-    <lastmod>2026-01-18</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://calcstack.tools/savings-interest-calculator</loc>
-    <lastmod>2026-01-18</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://calcstack.tools/markup-calculator</loc>
-    <lastmod>2026-01-18</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://calcstack.tools/commission-calculator</loc>
-    <lastmod>2026-01-18</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://calcstack.tools/onlyfans-earnings-calculator</loc>
-    <lastmod>2026-01-18</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://calcstack.tools/patreon-earnings-calculator</loc>
-    <lastmod>2026-01-18</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://calcstack.tools/tiktok-money-calculator</loc>
-    <lastmod>2026-01-18</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://calcstack.tools/twitch-earnings-calculator</loc>
-    <lastmod>2026-01-18</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-  <loc>https://calcstack.tools/youtube-cpm-calculator</loc>
-    <lastmod>2026-01-18</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-</url>
-
-  <url>
-  <loc>https://calcstack.tools/compound-interest-calculator</loc>
-</url>
-
-  <url>
-  <loc>https://calcstack.tools/vat-calculator</loc>
-</url>
-
-  <url>
-  <loc>https://calcstack.tools/salary-to-hourly-calculator</loc>
-</url>
-
-  <url>
-  <loc>https://calcstack.tools/hourly-to-salary-calculator</loc>
-</url>
-
-  <url>
-  <loc>https://calcstack.tools/mortgage-calculator</loc>
-</url>
-
-  <url>
-    <loc>https://calcstack.tools/income-tax-calculator-uk</loc>
-  </url>
-
-  <url>
-  <loc>https://calcstack.tools/stamp-duty-calculator-uk</loc>
-</url>
-
-<url>
-  <loc>https://calcstack.tools/calculators</loc>
-</url>
-
+  <url><loc>https://calcstack.tools/</loc><changefreq>monthly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://calcstack.tools/ad-revenue-calculator</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://calcstack.tools/break-even-calculator</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://calcstack.tools/commission-calculator</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://calcstack.tools/compound-interest-calculator</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://calcstack.tools/cpm-calculator</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://calcstack.tools/creator-earnings-calculator</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://calcstack.tools/discount-calculator</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://calcstack.tools/hourly-to-salary-calculator</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://calcstack.tools/income-tax-calculator-uk</loc><changefreq>yearly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://calcstack.tools/loan-calculator</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://calcstack.tools/markup-calculator</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://calcstack.tools/mortgage-calculator</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://calcstack.tools/onlyfans-earnings-calculator</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://calcstack.tools/patreon-earnings-calculator</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://calcstack.tools/percentage-calculator</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://calcstack.tools/profit-margin-calculator</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://calcstack.tools/roi-calculator</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://calcstack.tools/salary-to-hourly-calculator</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://calcstack.tools/savings-interest-calculator</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://calcstack.tools/stamp-duty-calculator-uk</loc><changefreq>yearly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://calcstack.tools/tiktok-money-calculator</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://calcstack.tools/twitch-earnings-calculator</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://calcstack.tools/vat-calculator</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://calcstack.tools/youtube-cpm-calculator</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://calcstack.tools/youtube-money-calculator</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://calcstack.tools/privacy</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://calcstack.tools/terms</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
 </urlset>
+```
+
+---
+
+**robots.txt**
+```
+User-agent: *
+Allow: /
+
+Sitemap: https://calcstack.tools/sitemap.xml
