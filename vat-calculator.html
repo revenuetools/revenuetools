@@ -4,32 +4,86 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>VAT Calculator (UK) — Add or Remove VAT | CalcStack</title>
-  <meta name="description" content="Free UK VAT calculator. Add VAT, remove VAT, and calculate VAT amounts instantly. Supports standard and custom VAT rates.">
+  <title>VAT Calculator — Add or Remove VAT / GST / Sales Tax | CalcStack</title>
+  <meta name="description" content="Free VAT calculator. Add VAT, remove VAT, and calculate VAT amounts instantly. Supports UK, EU, Australia, Canada and custom rates. Works with any currency.">
 
   <link rel="canonical" href="https://calcstack.tools/vat-calculator">
   <link rel="stylesheet" href="/css/styles.css">
+
+  <style>
+    select {
+      width: 100%;
+      padding: 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(17,24,39,0.85);
+      color: var(--text);
+      outline: none;
+    }
+    select:focus {
+      border-color: rgba(56,189,248,0.7);
+      box-shadow: 0 0 0 3px rgba(56,189,248,0.18);
+    }
+  </style>
 </head>
 
 <body class="page">
   <div class="container">
 
-    <h1 style="margin-bottom:8px;">VAT Calculator (UK)</h1>
+    <h1 style="margin-bottom:8px;">VAT / GST Calculator</h1>
 
     <p class="subtitle" style="max-width:860px;margin:0 auto 18px;">
-      Add VAT, remove VAT, and calculate the VAT amount using the UK standard rate or a custom percentage.
+      Add or remove VAT, GST, or sales tax instantly. Use a preset rate or enter your own.
     </p>
 
     <div class="card" style="max-width:920px;margin:0 auto;">
 
       <div class="row">
         <div>
-          <label for="amount">Amount (£)</label>
-          <input id="amount" type="number" value="100" min="0" step="0.01">
+          <label for="currency">Currency</label>
+          <select id="currency">
+            <option value="GBP">GBP — British Pound (£)</option>
+            <option value="USD">USD — US Dollar ($)</option>
+            <option value="EUR">EUR — Euro (€)</option>
+            <option value="CAD">CAD — Canadian Dollar (CA$)</option>
+            <option value="AUD">AUD — Australian Dollar (A$)</option>
+            <option value="INR">INR — Indian Rupee (₹)</option>
+            <option value="BRL">BRL — Brazilian Real (R$)</option>
+            <option value="MXN">MXN — Mexican Peso (MX$)</option>
+            <option value="SGD">SGD — Singapore Dollar (S$)</option>
+            <option value="NZD">NZD — New Zealand Dollar (NZ$)</option>
+          </select>
         </div>
 
         <div>
-          <label for="rate">VAT rate (%)</label>
+          <label for="amount">Amount</label>
+          <input id="amount" type="number" value="100" min="0" step="0.01">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="ratePreset">Rate preset</label>
+          <select id="ratePreset">
+            <option value="">— Custom —</option>
+            <option value="20">UK Standard VAT — 20%</option>
+            <option value="5">UK Reduced VAT — 5%</option>
+            <option value="0">UK Zero-rated — 0%</option>
+            <option value="23">Ireland VAT — 23%</option>
+            <option value="19">Germany VAT — 19%</option>
+            <option value="20">France VAT — 20%</option>
+            <option value="22">Italy VAT — 22%</option>
+            <option value="10">Australia GST — 10%</option>
+            <option value="15">New Zealand GST — 15%</option>
+            <option value="9">Singapore GST — 9%</option>
+            <option value="18">India GST (standard) — 18%</option>
+            <option value="5">Canada GST — 5%</option>
+            <option value="13">Canada HST (Ontario) — 13%</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="rate">VAT / GST rate (%)</label>
           <input id="rate" type="number" value="20" min="0" step="0.01">
         </div>
       </div>
@@ -38,8 +92,8 @@
         <div>
           <label for="mode">Calculation type</label>
           <select id="mode">
-            <option value="add">Add VAT</option>
-            <option value="remove">Remove VAT</option>
+            <option value="add">Add VAT (net → gross)</option>
+            <option value="remove">Remove VAT (gross → net)</option>
           </select>
         </div>
       </div>
@@ -57,11 +111,11 @@
           <div class="kpiBox">
             <div class="label">Net amount</div>
             <div class="value" id="netOut">—</div>
-            <div class="muted">Before VAT</div>
+            <div class="muted">Before VAT / GST</div>
           </div>
 
           <div class="kpiBox">
-            <div class="label">VAT amount</div>
+            <div class="label">VAT / GST amount</div>
             <div class="value" id="vatOut">—</div>
             <div class="muted">Tax portion</div>
           </div>
@@ -69,7 +123,7 @@
           <div class="kpiBox">
             <div class="label">Gross amount</div>
             <div class="value" id="grossOut">—</div>
-            <div class="muted">After VAT</div>
+            <div class="muted">After VAT / GST</div>
           </div>
 
         </div>
@@ -79,10 +133,9 @@
       </div>
 
       <div class="muted" style="margin-top:12px;font-size:12px;">
-        UK standard VAT rate is currently 20%. Reduced rates may apply in some cases.
+        UK standard VAT rate is 20%. Reduced rate is 5% (e.g. home energy, children's car seats). Always verify the applicable rate for your goods or services.
       </div>
 
-      <!-- RELATED CALCULATORS -->
       <hr style="border:0;border-top:1px solid rgba(255,255,255,0.10);margin:18px 0;">
 
       <div class="muted" style="font-size:13px;line-height:1.6;">
@@ -102,64 +155,84 @@
   </div>
 
 <script>
+  const money = (n) => {
+    const cur = document.getElementById("currency").value || "GBP";
+    const v = Number.isFinite(n) ? n : 0;
+    try {
+      return new Intl.NumberFormat(undefined, { style: "currency", currency: cur }).format(v);
+    } catch {
+      return v.toFixed(2) + " " + cur;
+    }
+  };
 
-const money = n =>
-  new Intl.NumberFormat(undefined,{
-    style:"currency",
-    currency:"GBP"
-  }).format(n);
+  const getVal = (id) => parseFloat(document.getElementById(id).value) || 0;
 
-const getVal = id =>
-  parseFloat(document.getElementById(id).value) || 0;
+  function calculate() {
+    const amount = Math.max(0, getVal("amount"));
+    const rate   = Math.max(0, getVal("rate")) / 100;
+    const mode   = document.getElementById("mode").value;
 
-function calculate(){
+    let net, vat, gross;
 
-  const amount = getVal("amount");
-  const rate = getVal("rate") / 100;
-  const mode = document.getElementById("mode").value;
+    if (mode === "add") {
+      net   = amount;
+      vat   = net * rate;
+      gross = net + vat;
+    } else {
+      gross = amount;
+      net   = gross / (1 + rate);
+      vat   = gross - net;
+    }
 
-  let net, vat, gross;
+    document.getElementById("netOut").textContent   = money(net);
+    document.getElementById("vatOut").textContent   = money(vat);
+    document.getElementById("grossOut").textContent = money(gross);
 
-  if(mode === "add"){
-
-    net = amount;
-    vat = net * rate;
-    gross = net + vat;
-
-  } else {
-
-    gross = amount;
-    net = gross / (1 + rate);
-    vat = gross - net;
-
+    document.getElementById("breakdown").textContent =
+      `Amount entered: ${money(amount)} · Rate: ${(rate * 100).toFixed(2)}% · Mode: ${mode === "add" ? "Add VAT" : "Remove VAT"} · Net: ${money(net)} · VAT: ${money(vat)} · Gross: ${money(gross)}`;
   }
 
-  netOut.textContent = money(net);
-  vatOut.textContent = money(vat);
-  grossOut.textContent = money(gross);
+  function resetAll() {
+    document.getElementById("currency").value   = "GBP";
+    document.getElementById("amount").value     = 100;
+    document.getElementById("ratePreset").value = "20";
+    document.getElementById("rate").value       = 20;
+    document.getElementById("mode").value       = "add";
+    calculate();
+  }
 
-  breakdown.textContent =
-    `Amount: ${money(amount)} · VAT rate: ${(rate*100).toFixed(2)}% · Mode: ${mode === "add" ? "Add VAT" : "Remove VAT"}`;
+  // Preset → rate field sync
+  document.getElementById("ratePreset").addEventListener("change", () => {
+    const preset = document.getElementById("ratePreset").value;
+    if (preset !== "") {
+      document.getElementById("rate").value = preset;
+    }
+    calculate();
+  });
 
-}
+  // If user edits rate manually, clear the preset
+  document.getElementById("rate").addEventListener("input", () => {
+    document.getElementById("ratePreset").value = "";
+    calculate();
+  });
 
-function resetAll(){
+  document.getElementById("calcBtn").addEventListener("click", calculate);
+  document.getElementById("resetBtn").addEventListener("click", resetAll);
 
-  amount.value = 100;
-  rate.value = 20;
-  mode.value = "add";
+  ["currency","amount","mode"].forEach(id => {
+    document.getElementById(id).addEventListener("input", calculate);
+    document.getElementById(id).addEventListener("change", calculate);
+    document.getElementById(id).addEventListener("keydown", (e) => {
+      if (e.key === "Enter") calculate();
+    });
+  });
 
+  document.getElementById("amount").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") calculate();
+  });
+
+  document.getElementById("yearNow").textContent = new Date().getFullYear();
   calculate();
-
-}
-
-calcBtn.onclick = calculate;
-resetBtn.onclick = resetAll;
-
-yearNow.textContent = new Date().getFullYear();
-
-calculate();
-
 </script>
 
 </body>
