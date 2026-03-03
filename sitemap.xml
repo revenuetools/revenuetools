@@ -29,13 +29,4 @@
   <url><loc>https://calcstack.tools/privacy</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
   <url><loc>https://calcstack.tools/terms</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
 </urlset>
-```
 
----
-
-**robots.txt**
-```
-User-agent: *
-Allow: /
-
-Sitemap: https://calcstack.tools/sitemap.xml
