@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Salary to Hourly Calculator (UK) — Convert Annual Salary | CalcStack</title>
-  <meta name="description" content="Free salary to hourly calculator. Convert annual salary into hourly wage based on hours per week and work weeks per year.">
+  <title>Salary to Hourly Calculator — Convert Annual Salary | CalcStack</title>
+  <meta name="description" content="Free salary to hourly calculator. Convert annual salary into hourly wage based on hours per week and work weeks per year. Supports multiple currencies.">
 
   <link rel="canonical" href="https://calcstack.tools/salary-to-hourly-calculator">
   <link rel="stylesheet" href="/css/styles.css">
@@ -24,13 +24,36 @@
 
       <div class="row">
         <div>
-          <label for="salary">Annual salary (£)</label>
-          <input id="salary" type="number" value="30000" min="0" step="0.01">
+          <label for="currency">Currency</label>
+          <select id="currency">
+            <option value="GBP">GBP — British Pound (£)</option>
+            <option value="USD">USD — US Dollar ($)</option>
+            <option value="EUR">EUR — Euro (€)</option>
+            <option value="CAD">CAD — Canadian Dollar (CA$)</option>
+            <option value="AUD">AUD — Australian Dollar (A$)</option>
+            <option value="INR">INR — Indian Rupee (₹)</option>
+            <option value="BRL">BRL — Brazilian Real (R$)</option>
+            <option value="MXN">MXN — Mexican Peso (MX$)</option>
+            <option value="SGD">SGD — Singapore Dollar (S$)</option>
+            <option value="NZD">NZD — New Zealand Dollar (NZ$)</option>
+          </select>
         </div>
 
         <div>
+          <label for="salary">Annual salary</label>
+          <input id="salary" type="number" value="30000" min="0" step="0.01">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
           <label for="hours">Hours per week</label>
           <input id="hours" type="number" value="40" min="0" step="0.1">
+        </div>
+
+        <div>
+          <label for="days">Working days per week</label>
+          <input id="days" type="number" value="5" min="1" max="7" step="1">
         </div>
       </div>
 
@@ -60,7 +83,7 @@
           <div class="kpiBox">
             <div class="label">Daily pay</div>
             <div class="value" id="dailyOut">—</div>
-            <div class="muted">Based on hours per week</div>
+            <div class="muted">Based on days per week</div>
           </div>
 
           <div class="kpiBox">
@@ -85,15 +108,14 @@
         Results are estimates based on your input. Actual pay may vary depending on contract and overtime.
       </div>
 
-      <!-- RELATED CALCULATORS -->
       <hr style="border:0;border-top:1px solid rgba(255,255,255,0.10);margin:18px 0;">
 
       <div class="muted" style="font-size:13px;line-height:1.6;">
         Related calculators:
+        <a href="/hourly-to-salary-calculator">Hourly to Salary Calculator</a> ·
+        <a href="/income-tax-calculator-uk">Income Tax Calculator (UK)</a> ·
         <a href="/percentage-calculator">Percentage Calculator</a> ·
-        <a href="/vat-calculator">VAT Calculator</a> ·
-        <a href="/loan-calculator">Loan Calculator</a> ·
-        <a href="/compound-interest-calculator">Compound Interest Calculator</a>
+        <a href="/loan-calculator">Loan Calculator</a>
       </div>
 
     </div>
@@ -105,54 +127,61 @@
   </div>
 
 <script>
+  const money = (n) => {
+    const cur = document.getElementById("currency").value || "GBP";
+    const v = Number.isFinite(n) ? n : 0;
+    try {
+      return new Intl.NumberFormat(undefined, { style: "currency", currency: cur }).format(v);
+    } catch {
+      return v.toFixed(2) + " " + cur;
+    }
+  };
 
-const money = n =>
-  new Intl.NumberFormat(undefined,{
-    style:"currency",
-    currency:"GBP"
-  }).format(n);
+  const getVal = (id) => parseFloat(document.getElementById(id).value) || 0;
 
-const getVal = id =>
-  parseFloat(document.getElementById(id).value) || 0;
+  function calculate() {
+    const salary  = Math.max(0, getVal("salary"));
+    const hours   = Math.max(0, getVal("hours"));
+    const days    = Math.max(1, getVal("days"));
+    const weeks   = Math.max(0, getVal("weeks"));
 
-function calculate(){
+    const totalHours = hours * weeks;
+    const hourly     = totalHours > 0 ? salary / totalHours : 0;
+    const weekly     = weeks > 0 ? salary / weeks : 0;
+    const monthly    = salary / 12;
+    const daily      = weekly / days;
 
-  const salary = getVal("salary");
-  const hours = getVal("hours");
-  const weeks = getVal("weeks");
+    document.getElementById("hourlyOut").textContent  = money(hourly);
+    document.getElementById("dailyOut").textContent   = money(daily);
+    document.getElementById("weeklyOut").textContent  = money(weekly);
+    document.getElementById("monthlyOut").textContent = money(monthly);
 
-  const hourly = salary / (hours * weeks);
-  const weekly = salary / weeks;
-  const monthly = salary / 12;
-  const daily = weekly / (hours / 5);
+    document.getElementById("breakdown").textContent =
+      `Salary: ${money(salary)} · Hours/week: ${hours} · Days/week: ${days} · Weeks/year: ${weeks}`;
+  }
 
-  hourlyOut.textContent = money(hourly);
-  weeklyOut.textContent = money(weekly);
-  monthlyOut.textContent = money(monthly);
-  dailyOut.textContent = money(daily);
+  function resetAll() {
+    document.getElementById("currency").value = "GBP";
+    document.getElementById("salary").value   = 30000;
+    document.getElementById("hours").value    = 40;
+    document.getElementById("days").value     = 5;
+    document.getElementById("weeks").value    = 52;
+    calculate();
+  }
 
-  breakdown.textContent =
-    `Salary: ${money(salary)} · Hours/week: ${hours} · Weeks/year: ${weeks}`;
+  document.getElementById("calcBtn").addEventListener("click", calculate);
+  document.getElementById("resetBtn").addEventListener("click", resetAll);
 
-}
+  ["currency","salary","hours","days","weeks"].forEach(id => {
+    document.getElementById(id).addEventListener("input", calculate);
+    document.getElementById(id).addEventListener("change", calculate);
+    document.getElementById(id).addEventListener("keydown", (e) => {
+      if (e.key === "Enter") calculate();
+    });
+  });
 
-function resetAll(){
-
-  salary.value = 30000;
-  hours.value = 40;
-  weeks.value = 52;
-
+  document.getElementById("yearNow").textContent = new Date().getFullYear();
   calculate();
-
-}
-
-calcBtn.onclick = calculate;
-resetBtn.onclick = resetAll;
-
-yearNow.textContent = new Date().getFullYear();
-
-calculate();
-
 </script>
 
 </body>
