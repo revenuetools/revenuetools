@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>Creator Earnings Calculator — Estimate Subscription Income | CalcStack</title>
-  <meta name="description" content="Free creator earnings calculator. Estimate monthly and yearly income from subscriptions, tips, and extra sales. Works for Patreon, OnlyFans, YouTube memberships, and more.">
+  <meta name="description" content="Free creator earnings calculator. Estimate monthly and yearly income from subscriptions, tips, and extra sales. Works for Patreon, OnlyFans, YouTube memberships, and more. Supports multiple currencies.">
   <link rel="canonical" href="https://calcstack.tools/creator-earnings-calculator">
 
   <link rel="stylesheet" href="/css/styles.css">
@@ -21,24 +21,55 @@
     </div>
 
     <div class="card toolPageCard">
+
+      <div class="row">
+        <div>
+          <label for="currency">Currency</label>
+          <select id="currency">
+            <option value="GBP">GBP — British Pound (£)</option>
+            <option value="USD">USD — US Dollar ($)</option>
+            <option value="EUR">EUR — Euro (€)</option>
+            <option value="CAD">CAD — Canadian Dollar (CA$)</option>
+            <option value="AUD">AUD — Australian Dollar (A$)</option>
+            <option value="INR">INR — Indian Rupee (₹)</option>
+            <option value="BRL">BRL — Brazilian Real (R$)</option>
+            <option value="MXN">MXN — Mexican Peso (MX$)</option>
+            <option value="SGD">SGD — Singapore Dollar (S$)</option>
+            <option value="NZD">NZD — New Zealand Dollar (NZ$)</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="platform">Platform preset</label>
+          <select id="platform">
+            <option value="custom">Custom / Other</option>
+            <option value="onlyfans">OnlyFans (20% fee)</option>
+            <option value="patreon">Patreon (8% fee)</option>
+            <option value="youtube">YouTube Memberships (30% fee)</option>
+            <option value="twitch">Twitch Subscriptions (50% fee)</option>
+            <option value="substack">Substack (10% fee)</option>
+          </select>
+        </div>
+      </div>
+
       <div class="row">
         <div>
           <label for="subs">Subscribers</label>
           <input id="subs" type="number" inputmode="numeric" min="0" step="1" value="100">
         </div>
         <div>
-          <label for="price">Subscription price (£)</label>
+          <label for="price">Subscription price</label>
           <input id="price" type="number" inputmode="decimal" min="0" step="0.01" value="10">
         </div>
       </div>
 
       <div class="row">
         <div>
-          <label for="extras">Extra sales per month (£)</label>
+          <label for="extras">Extra sales per month <span class="hint">optional</span></label>
           <input id="extras" type="number" inputmode="decimal" min="0" step="0.01" value="500">
         </div>
         <div>
-          <label for="tips">Tips per month (£)</label>
+          <label for="tips">Tips per month <span class="hint">optional</span></label>
           <input id="tips" type="number" inputmode="decimal" min="0" step="0.01" value="200">
         </div>
       </div>
@@ -49,7 +80,7 @@
           <input id="fee" type="number" inputmode="decimal" min="0" max="100" step="0.1" value="20">
         </div>
         <div>
-          <label for="expenses">Monthly expenses (£) <span class="hint">optional</span></label>
+          <label for="expenses">Monthly expenses <span class="hint">optional</span></label>
           <input id="expenses" type="number" inputmode="decimal" min="0" step="0.01" value="0" placeholder="e.g. 150">
         </div>
       </div>
@@ -82,13 +113,27 @@
       </div>
     </div>
 
-    <div class="footer">© 2026 CalcStack.tools</div>
+    <div class="footer">© <span id="yearNow"></span> CalcStack.tools</div>
   </div>
 
   <script>
-    const moneyGBP = (n) => {
+    const PLATFORM_PRESETS = {
+      custom:    { fee: 20 },
+      onlyfans:  { fee: 20 },
+      patreon:   { fee: 8  },
+      youtube:   { fee: 30 },
+      twitch:    { fee: 50 },
+      substack:  { fee: 10 },
+    };
+
+    const money = (n) => {
+      const cur = document.getElementById("currency").value || "GBP";
       const v = Number.isFinite(n) ? n : 0;
-      return new Intl.NumberFormat(undefined, { style: "currency", currency: "GBP" }).format(v);
+      try {
+        return new Intl.NumberFormat(undefined, { style: "currency", currency: cur }).format(v);
+      } catch {
+        return v.toFixed(2) + " " + cur;
+      }
     };
 
     const getVal = (id) => {
@@ -97,52 +142,61 @@
       return Number.isFinite(v) ? v : 0;
     };
 
-    function calculate() {
-      const subs = Math.max(0, getVal("subs"));
-      const price = Math.max(0, getVal("price"));
-      const extras = Math.max(0, getVal("extras"));
-      const tips = Math.max(0, getVal("tips"));
-      const feePct = Math.min(100, Math.max(0, getVal("fee")));
-      const expenses = Math.max(0, getVal("expenses"));
-
-      const grossSubs = subs * price;
-      const grossTotal = grossSubs + extras + tips;
-
-      const fee = grossTotal * (feePct / 100);
-      const netBeforeExpenses = grossTotal - fee;
-      const monthlyNet = Math.max(0, netBeforeExpenses - expenses);
-      const yearlyNet = monthlyNet * 12;
-
-      document.getElementById("monthlyNet").textContent = moneyGBP(monthlyNet);
-      document.getElementById("yearlyNet").textContent = moneyGBP(yearlyNet);
-
-      document.getElementById("breakdown").textContent =
-        `Gross: ${moneyGBP(grossTotal)} (Subs: ${moneyGBP(grossSubs)}, Extras: ${moneyGBP(extras)}, Tips: ${moneyGBP(tips)}) · ` +
-        `Fee (${feePct}%): ${moneyGBP(fee)} · Expenses: ${moneyGBP(expenses)} · Net: ${moneyGBP(monthlyNet)}`;
-    }
-
-    function resetAll() {
-      document.getElementById("subs").value = 100;
-      document.getElementById("price").value = 10;
-      document.getElementById("extras").value = 500;
-      document.getElementById("tips").value = 200;
-      document.getElementById("fee").value = 20;
-      document.getElementById("expenses").value = 0;
+    function applyPlatformPreset() {
+      const key = document.getElementById("platform").value;
+      const preset = PLATFORM_PRESETS[key] || PLATFORM_PRESETS.custom;
+      document.getElementById("fee").value = preset.fee;
       calculate();
     }
 
+    function calculate() {
+      const subs     = Math.max(0, getVal("subs"));
+      const price    = Math.max(0, getVal("price"));
+      const extras   = Math.max(0, getVal("extras"));
+      const tips     = Math.max(0, getVal("tips"));
+      const feePct   = Math.min(100, Math.max(0, getVal("fee")));
+      const expenses = Math.max(0, getVal("expenses"));
+
+      const grossSubs  = subs * price;
+      const grossTotal = grossSubs + extras + tips;
+      const fee        = grossTotal * (feePct / 100);
+      const netBefore  = grossTotal - fee;
+      const monthlyNet = Math.max(0, netBefore - expenses);
+      const yearlyNet  = monthlyNet * 12;
+
+      document.getElementById("monthlyNet").textContent = money(monthlyNet);
+      document.getElementById("yearlyNet").textContent  = money(yearlyNet);
+
+      document.getElementById("breakdown").textContent =
+        `Gross: ${money(grossTotal)} (Subs: ${money(grossSubs)}, Extras: ${money(extras)}, Tips: ${money(tips)}) · ` +
+        `Fee (${feePct}%): ${money(fee)} · Expenses: ${money(expenses)} · Net: ${money(monthlyNet)}`;
+    }
+
+    function resetAll() {
+      document.getElementById("currency").value  = "GBP";
+      document.getElementById("platform").value  = "custom";
+      document.getElementById("subs").value      = 100;
+      document.getElementById("price").value     = 10;
+      document.getElementById("extras").value    = 500;
+      document.getElementById("tips").value      = 200;
+      document.getElementById("fee").value       = 20;
+      document.getElementById("expenses").value  = 0;
+      calculate();
+    }
+
+    document.getElementById("platform").addEventListener("change", applyPlatformPreset);
     document.getElementById("calcBtn").addEventListener("click", calculate);
     document.getElementById("resetBtn").addEventListener("click", resetAll);
 
-    // Auto-calc when values change (feels "app-like")
-    ["subs","price","extras","tips","fee","expenses"].forEach(id => {
+    ["currency","subs","price","extras","tips","fee","expenses"].forEach(id => {
       document.getElementById(id).addEventListener("input", calculate);
+      document.getElementById(id).addEventListener("change", calculate);
       document.getElementById(id).addEventListener("keydown", (e) => {
         if (e.key === "Enter") calculate();
       });
     });
 
-    // Run once on load
+    document.getElementById("yearNow").textContent = new Date().getFullYear();
     calculate();
   </script>
 </body>
