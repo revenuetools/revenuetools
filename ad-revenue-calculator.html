@@ -24,13 +24,47 @@
       </div>
 
       <div class="card" style="max-width:920px;margin:0 auto;">
+
+        <div class="row">
+          <div>
+            <label for="platform">Platform preset</label>
+            <select id="platform">
+              <option value="custom">Custom / Other</option>
+              <option value="youtube">YouTube (45% cut)</option>
+              <option value="blog">Blog / Display Ads (0% cut)</option>
+              <option value="facebook">Facebook / Meta (45% cut)</option>
+              <option value="twitch">Twitch (50% cut)</option>
+              <option value="rumble">Rumble (40% cut)</option>
+            </select>
+          </div>
+          <div>
+            <label for="currency">Currency</label>
+            <select id="currency">
+              <option value="GBP">GBP — British Pound (£)</option>
+              <option value="USD">USD — US Dollar ($)</option>
+              <option value="EUR">EUR — Euro (€)</option>
+              <option value="CAD">CAD — Canadian Dollar (CA$)</option>
+              <option value="AUD">AUD — Australian Dollar (A$)</option>
+              <option value="INR">INR — Indian Rupee (₹)</option>
+              <option value="BRL">BRL — Brazilian Real (R$)</option>
+              <option value="MXN">MXN — Mexican Peso (MX$)</option>
+              <option value="SGD">SGD — Singapore Dollar (S$)</option>
+              <option value="NZD">NZD — New Zealand Dollar (NZ$)</option>
+            </select>
+          </div>
+        </div>
+
         <div class="row">
           <div>
             <label for="views">Monthly views</label>
             <input id="views" type="number" inputmode="numeric" min="0" step="1" value="100000">
           </div>
           <div>
-            <label for="rpm">RPM (earnings per 1,000 monetized views)</label>
+            <label for="rpm">RPM — earnings per 1,000 monetized views
+              <span style="color:var(--muted2);font-size:12px;display:block;margin-top:2px;">
+                Typical: $1–3 general, $5–15 finance/tech, $20+ legal/insurance
+              </span>
+            </label>
             <input id="rpm" type="number" inputmode="decimal" min="0" step="0.01" value="2.50" placeholder="e.g. 2.50">
           </div>
         </div>
@@ -41,16 +75,12 @@
             <input id="monRate" type="number" inputmode="decimal" min="0" max="100" step="0.1" value="70" placeholder="e.g. 70">
           </div>
           <div>
-            <label for="cut">Platform cut (%) <span style="color:var(--muted2);font-size:12px;">optional</span></label>
+            <label for="cut">Platform cut (%)</label>
             <input id="cut" type="number" inputmode="decimal" min="0" max="100" step="0.1" value="0" placeholder="e.g. 45 for YouTube">
           </div>
         </div>
 
         <div class="row">
-          <div>
-            <label for="currency">Currency</label>
-            <input id="currency" type="text" value="GBP" placeholder="GBP / USD / EUR">
-          </div>
           <div>
             <label for="extras">Other monthly ad income <span style="color:var(--muted2);font-size:12px;">optional</span></label>
             <input id="extras" type="number" inputmode="decimal" min="0" step="0.01" value="0" placeholder="e.g. sponsorships, bonuses">
@@ -81,7 +111,7 @@
         </div>
 
         <div class="muted" style="margin-top:12px;font-size:12px;line-height:1.4;">
-          Note: RPM varies by niche, country, seasonality, and ad inventory. Results are estimates.
+          Note: RPM varies by niche, country, seasonality, and ad inventory. Results are estimates only.
         </div>
       </div>
 
@@ -90,6 +120,15 @@
   </div>
 
   <script>
+    const PLATFORM_PRESETS = {
+      custom:   { cut: 0 },
+      youtube:  { cut: 45 },
+      blog:     { cut: 0 },
+      facebook: { cut: 45 },
+      twitch:   { cut: 50 },
+      rumble:   { cut: 40 },
+    };
+
     const clamp = (n, min, max) => Math.min(max, Math.max(min, n));
 
     const getNum = (id) => {
@@ -98,41 +137,39 @@
       return Number.isFinite(v) ? v : 0;
     };
 
-    const getCurrency = () => {
-      const raw = (document.getElementById("currency").value || "GBP").trim().toUpperCase();
-      // keep it simple + safe: only allow 3-letter currency codes
-      return /^[A-Z]{3}$/.test(raw) ? raw : "GBP";
-    };
-
     const money = (n) => {
-      const cur = getCurrency();
+      const cur = document.getElementById("currency").value || "GBP";
       const v = Number.isFinite(n) ? n : 0;
       try {
         return new Intl.NumberFormat(undefined, { style: "currency", currency: cur }).format(v);
       } catch {
-        // fallback if someone enters an unknown currency
         return v.toFixed(2) + " " + cur;
       }
     };
 
-    function calculate(){
-      const views = Math.max(0, getNum("views"));
-      const rpm = Math.max(0, getNum("rpm"));
-      const monRate = clamp(getNum("monRate"), 0, 100) / 100;
-      const cut = clamp(getNum("cut"), 0, 100) / 100;
-      const extras = Math.max(0, getNum("extras"));
+    function applyPlatformPreset() {
+      const key = document.getElementById("platform").value;
+      const preset = PLATFORM_PRESETS[key] || PLATFORM_PRESETS.custom;
+      document.getElementById("cut").value = preset.cut;
+      calculate();
+    }
+
+    function calculate() {
+      const views     = Math.max(0, getNum("views"));
+      const rpm       = Math.max(0, getNum("rpm"));
+      const monRate   = clamp(getNum("monRate"), 0, 100) / 100;
+      const cut       = clamp(getNum("cut"), 0, 100) / 100;
+      const extras    = Math.max(0, getNum("extras"));
 
       const monetizedViews = views * monRate;
-      const grossAds = (monetizedViews / 1000) * rpm;
-
-      const platformFee = grossAds * cut;
-      const netAds = grossAds - platformFee;
-
-      const monthly = Math.max(0, netAds + extras);
-      const yearly = monthly * 12;
+      const grossAds       = (monetizedViews / 1000) * rpm;
+      const platformFee    = grossAds * cut;
+      const netAds         = grossAds - platformFee;
+      const monthly        = Math.max(0, netAds + extras);
+      const yearly         = monthly * 12;
 
       document.getElementById("monthly").textContent = money(monthly);
-      document.getElementById("yearly").textContent = money(yearly);
+      document.getElementById("yearly").textContent  = money(yearly);
 
       document.getElementById("breakdown").textContent =
         `Views: ${Math.round(views).toLocaleString()} · Monetized: ${(monRate*100).toFixed(1)}% → ` +
@@ -141,16 +178,18 @@
         `Extras: ${money(extras)} · Estimated monthly: ${money(monthly)}`;
     }
 
-    function resetAll(){
-      document.getElementById("views").value = 100000;
-      document.getElementById("rpm").value = 2.50;
-      document.getElementById("monRate").value = 70;
-      document.getElementById("cut").value = 0;
-      document.getElementById("currency").value = "GBP";
-      document.getElementById("extras").value = 0;
+    function resetAll() {
+      document.getElementById("platform").value  = "custom";
+      document.getElementById("currency").value  = "GBP";
+      document.getElementById("views").value     = 100000;
+      document.getElementById("rpm").value       = 2.50;
+      document.getElementById("monRate").value   = 70;
+      document.getElementById("cut").value       = 0;
+      document.getElementById("extras").value    = 0;
       calculate();
     }
 
+    document.getElementById("platform").addEventListener("change", applyPlatformPreset);
     document.getElementById("calcBtn").addEventListener("click", calculate);
     document.getElementById("resetBtn").addEventListener("click", resetAll);
 
