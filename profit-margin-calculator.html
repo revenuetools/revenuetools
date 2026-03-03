@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>Profit Margin Calculator — Margin, Profit & Markup | CalcStack</title>
-  <meta name="description" content="Free profit margin calculator. Calculate profit, profit margin %, and markup % from revenue and costs. Great for business, eCommerce, creators, and pricing.">
+  <meta name="description" content="Free profit margin calculator. Calculate profit, profit margin %, and markup % from revenue and costs. Great for business, eCommerce, creators, and pricing. Supports multiple currencies.">
 
   <link rel="canonical" href="https://calcstack.tools/profit-margin-calculator">
   <link rel="stylesheet" href="/css/styles.css">
@@ -24,12 +24,30 @@
 
       <div class="row">
         <div>
-          <label for="revenue">Revenue / Sale price (£)</label>
-          <input id="revenue" type="number" inputmode="decimal" min="0" step="0.01" value="100">
+          <label for="currency">Currency</label>
+          <select id="currency">
+            <option value="GBP">GBP — British Pound (£)</option>
+            <option value="USD">USD — US Dollar ($)</option>
+            <option value="EUR">EUR — Euro (€)</option>
+            <option value="CAD">CAD — Canadian Dollar (CA$)</option>
+            <option value="AUD">AUD — Australian Dollar (A$)</option>
+            <option value="INR">INR — Indian Rupee (₹)</option>
+            <option value="BRL">BRL — Brazilian Real (R$)</option>
+            <option value="MXN">MXN — Mexican Peso (MX$)</option>
+            <option value="SGD">SGD — Singapore Dollar (S$)</option>
+            <option value="NZD">NZD — New Zealand Dollar (NZ$)</option>
+          </select>
         </div>
 
         <div>
-          <label for="cost">Cost (£)</label>
+          <label for="revenue">Revenue / Sale price</label>
+          <input id="revenue" type="number" inputmode="decimal" min="0" step="0.01" value="100">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="cost">Cost</label>
           <input id="cost" type="number" inputmode="decimal" min="0" step="0.01" value="60">
         </div>
       </div>
@@ -77,9 +95,14 @@
   </div>
 
 <script>
-  const moneyGBP = (n) => {
+  const money = (n) => {
+    const cur = document.getElementById("currency").value || "GBP";
     const v = Number.isFinite(n) ? n : 0;
-    return new Intl.NumberFormat(undefined, { style: "currency", currency: "GBP" }).format(v);
+    try {
+      return new Intl.NumberFormat(undefined, { style: "currency", currency: cur }).format(v);
+    } catch {
+      return v.toFixed(2) + " " + cur;
+    }
   };
 
   const pct = (n) => (Number.isFinite(n) ? n : 0).toFixed(2) + "%";
@@ -89,39 +112,37 @@
     return Number.isFinite(v) ? v : 0;
   };
 
-  function calculate(){
+  function calculate() {
     const revenue = Math.max(0, getVal("revenue"));
-    const cost = Math.max(0, getVal("cost"));
+    const cost    = Math.max(0, getVal("cost"));
+    const profit  = revenue - cost;
 
-    const profit = revenue - cost;
+    const margin = revenue > 0 ? (profit / revenue) * 100 : 0;
+    const markup = cost > 0    ? (profit / cost) * 100    : 0;
 
-    let margin = 0;
-    if (revenue > 0) margin = (profit / revenue) * 100;
-
-    let markup = 0;
-    if (cost > 0) markup = (profit / cost) * 100;
-
-    document.getElementById("profitOut").textContent = moneyGBP(profit);
+    document.getElementById("profitOut").textContent = money(profit);
     document.getElementById("marginOut").textContent = pct(margin);
     document.getElementById("markupOut").textContent = pct(markup);
 
     document.getElementById("breakdown").textContent =
-      `Revenue: ${moneyGBP(revenue)} · Cost: ${moneyGBP(cost)} · Profit: ${moneyGBP(profit)} · Margin: ${pct(margin)} · Markup: ${pct(markup)}`;
+      `Revenue: ${money(revenue)} · Cost: ${money(cost)} · Profit: ${money(profit)} · Margin: ${pct(margin)} · Markup: ${pct(markup)}`;
   }
 
-  function resetAll(){
-    document.getElementById("revenue").value = 100;
-    document.getElementById("cost").value = 60;
+  function resetAll() {
+    document.getElementById("currency").value = "GBP";
+    document.getElementById("revenue").value  = 100;
+    document.getElementById("cost").value     = 60;
     calculate();
   }
 
   document.getElementById("calcBtn").addEventListener("click", calculate);
   document.getElementById("resetBtn").addEventListener("click", resetAll);
 
-  ["revenue","cost"].forEach(id => {
+  ["currency","revenue","cost"].forEach(id => {
     document.getElementById(id).addEventListener("input", calculate);
+    document.getElementById(id).addEventListener("change", calculate);
     document.getElementById(id).addEventListener("keydown", (e) => {
-      if(e.key === "Enter") calculate();
+      if (e.key === "Enter") calculate();
     });
   });
 
