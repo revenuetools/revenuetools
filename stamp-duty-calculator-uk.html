@@ -4,11 +4,48 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Stamp Duty Calculator (UK) — SDLT Property Tax | CalcStack</title>
-  <meta name="description" content="Free UK stamp duty calculator. Calculate SDLT on property purchases including additional property surcharge.">
+  <title>Stamp Duty Calculator (UK) — SDLT 2025 Rates | CalcStack</title>
+  <meta name="description" content="Free UK stamp duty calculator. Updated for April 2025 rates. Calculate SDLT for standard buyers, first-time buyers, and additional properties in England and Northern Ireland.">
 
   <link rel="canonical" href="https://calcstack.tools/stamp-duty-calculator-uk">
   <link rel="stylesheet" href="/css/styles.css">
+
+  <style>
+    select {
+      width: 100%;
+      padding: 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(17,24,39,0.85);
+      color: var(--text);
+      outline: none;
+    }
+    select:focus {
+      border-color: rgba(56,189,248,0.7);
+      box-shadow: 0 0 0 3px rgba(56,189,248,0.18);
+    }
+    .bandTable {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin-top: 10px;
+    }
+    .bandTable th, .bandTable td {
+      padding: 6px 10px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    .bandTable th {
+      color: var(--muted, rgba(255,255,255,0.5));
+      font-weight: 600;
+    }
+    .bandTable td:last-child {
+      text-align: right;
+    }
+    .bandTable tr.highlight td {
+      color: var(--accent, #38bdf8);
+    }
+  </style>
 </head>
 
 <body class="page">
@@ -17,26 +54,25 @@
     <h1 style="margin-bottom:8px;">Stamp Duty Calculator (UK)</h1>
 
     <p class="subtitle" style="max-width:900px;margin:0 auto 18px;">
-      Calculate stamp duty land tax (SDLT) on residential property purchases in England and Northern Ireland.
+      Calculate SDLT on residential property purchases in England and Northern Ireland. Updated for April 2025 rates.
     </p>
 
     <div class="card" style="max-width:920px;margin:0 auto;">
 
       <div class="row">
-
         <div>
           <label for="price">Property price (£)</label>
-          <input id="price" type="number" value="300000" min="0" step="0.01">
+          <input id="price" type="number" value="300000" min="0" step="1">
         </div>
 
         <div>
-          <label for="extra">Additional property?</label>
-          <select id="extra">
-            <option value="no">No</option>
-            <option value="yes">Yes (3% surcharge)</option>
+          <label for="buyerType">Buyer type</label>
+          <select id="buyerType">
+            <option value="standard">Standard buyer (moving home)</option>
+            <option value="ftb">First-time buyer</option>
+            <option value="additional">Additional property / buy-to-let</option>
           </select>
         </div>
-
       </div>
 
       <div class="actions">
@@ -48,7 +84,6 @@
       <div class="results">
 
         <div class="kpi">
-
           <div class="kpiBox">
             <div class="label">Stamp duty</div>
             <div class="value" id="dutyOut">—</div>
@@ -66,22 +101,41 @@
             <div class="value" id="totalOut">—</div>
             <div class="muted">Property + tax</div>
           </div>
-
         </div>
 
-        <div class="muted" id="breakdown"></div>
+        <!-- Band breakdown table -->
+        <div id="bandBreakdownWrap" style="margin-top:14px;display:none;">
+          <div class="muted" style="font-size:12px;margin-bottom:6px;">Band breakdown</div>
+          <table class="bandTable" id="bandTable">
+            <thead>
+              <tr>
+                <th>Band</th>
+                <th>Rate</th>
+                <th>Taxable amount</th>
+                <th>Tax</th>
+              </tr>
+            </thead>
+            <tbody id="bandBody"></tbody>
+          </table>
+        </div>
 
+        <div class="muted" id="breakdown" style="margin-top:10px;"></div>
       </div>
 
-      <!-- RELATED CALCULATORS -->
+      <div class="muted" style="margin-top:12px;font-size:12px;line-height:1.6;">
+        Rates effective from 1 April 2025. Applies to England and Northern Ireland only. Scotland uses LBTT; Wales uses LTT.
+        Additional property surcharge: 5% on top of standard rates.
+        First-time buyer relief: 0% up to £300,000, 5% on £300,001–£500,000, no relief above £500,000.
+      </div>
+
       <hr style="border:0;border-top:1px solid rgba(255,255,255,0.10);margin:18px 0;">
 
       <div class="muted" style="font-size:13px;line-height:1.6;">
         Related calculators:
         <a href="/mortgage-calculator">Mortgage Calculator</a> ·
-        <a href="/income-tax-calculator-uk">Income Tax Calculator</a> ·
+        <a href="/income-tax-calculator-uk">Income Tax Calculator (UK)</a> ·
         <a href="/loan-calculator">Loan Calculator</a> ·
-        <a href="/percentage-calculator">Percentage Calculator</a>
+        <a href="/savings-interest-calculator">Savings Calculator</a>
       </div>
 
     </div>
@@ -93,78 +147,136 @@
   </div>
 
 <script>
+  const money = (n) => {
+    const v = Number.isFinite(n) ? n : 0;
+    try {
+      return new Intl.NumberFormat(undefined, { style: "currency", currency: "GBP" }).format(v);
+    } catch {
+      return "£" + v.toFixed(2);
+    }
+  };
 
-const money = n =>
-  new Intl.NumberFormat(undefined,{
-    style:"currency",
-    currency:"GBP"
-  }).format(n);
+  const getVal = (id) => parseFloat(document.getElementById(id).value) || 0;
 
-const getVal = id =>
-  parseFloat(document.getElementById(id).value) || 0;
-
-function calculate(){
-
-  const price = getVal("price");
-  const extra = document.getElementById("extra").value === "yes";
-
-  let duty = 0;
-
-  const bands = [
-    [250000, 0.00],
-    [925000, 0.05],
-    [1500000, 0.10],
-    [Infinity, 0.12]
+  // Standard bands from 1 April 2025 (England & NI)
+  // [upper limit, rate]
+  const STANDARD_BANDS = [
+    [125000,   0.00],
+    [250000,   0.02],
+    [925000,   0.05],
+    [1500000,  0.10],
+    [Infinity, 0.12],
   ];
 
-  let prev = 0;
+  // Additional property: 5% surcharge on top of standard rates
+  const ADDITIONAL_BANDS = STANDARD_BANDS.map(([limit, rate]) => [limit, rate + 0.05]);
 
-  for(const [limit, rate] of bands){
+  // First-time buyer bands: 0% up to 300k, 5% 300k–500k, then standard above 500k
+  // But if price > 500k, no relief at all — use standard rates
+  const FTB_BANDS = [
+    [300000,   0.00],
+    [500000,   0.05],
+    [925000,   0.05],
+    [1500000,  0.10],
+    [Infinity, 0.12],
+  ];
 
-    const taxable = Math.max(0, Math.min(price, limit) - prev);
+  function calcSDLT(price, bands) {
+    let duty = 0;
+    let prev = 0;
+    const rows = [];
 
-    duty += taxable * rate;
+    for (const [limit, rate] of bands) {
+      const ceiling  = Math.min(price, limit);
+      const taxable  = Math.max(0, ceiling - prev);
+      const tax      = taxable * rate;
+      if (taxable > 0) {
+        rows.push({ from: prev, to: ceiling, rate, taxable, tax });
+      }
+      duty += tax;
+      prev = limit;
+      if (price <= limit) break;
+    }
 
-    prev = limit;
-
-    if(price <= limit) break;
-
+    return { duty, rows };
   }
 
-  if(extra){
-
-    duty += price * 0.03;
-
+  function formatBand(from, to) {
+    if (to === Infinity) return `Over ${money(from)}`;
+    return `${money(from + (from === 0 ? 0 : 1))} – ${money(to)}`;
   }
 
-  const effective = price > 0 ? (duty / price) * 100 : 0;
-  const total = price + duty;
+  function calculate() {
+    const price      = Math.max(0, getVal("price"));
+    const buyerType  = document.getElementById("buyerType").value;
 
-  dutyOut.textContent = money(duty);
-  totalOut.textContent = money(total);
-  rateOut.textContent = effective.toFixed(2) + "%";
+    let bands;
+    let label;
 
-  breakdown.textContent =
-    `Property price: ${money(price)} · Additional property: ${extra ? "Yes" : "No"}`;
+    if (buyerType === "ftb") {
+      if (price > 500000) {
+        // No relief — use standard rates
+        bands = STANDARD_BANDS;
+        label = "First-time buyer (no relief — price over £500,000, standard rates apply)";
+      } else {
+        bands = FTB_BANDS;
+        label = "First-time buyer relief";
+      }
+    } else if (buyerType === "additional") {
+      bands = ADDITIONAL_BANDS;
+      label = "Additional property (5% surcharge on all bands)";
+    } else {
+      bands = STANDARD_BANDS;
+      label = "Standard buyer";
+    }
 
-}
+    const { duty, rows } = calcSDLT(price, bands);
+    const effective = price > 0 ? (duty / price) * 100 : 0;
+    const total     = price + duty;
 
-function resetAll(){
+    document.getElementById("dutyOut").textContent  = money(duty);
+    document.getElementById("rateOut").textContent  = effective.toFixed(2) + "%";
+    document.getElementById("totalOut").textContent = money(total);
+    document.getElementById("breakdown").textContent =
+      `Property: ${money(price)} · Buyer type: ${label} · SDLT: ${money(duty)}`;
 
-  price.value = 300000;
-  extra.value = "no";
+    // Band table
+    const tbody = document.getElementById("bandBody");
+    tbody.innerHTML = "";
+    rows.forEach(({ from, to, rate, taxable, tax }) => {
+      const tr = document.createElement("tr");
+      if (tax > 0) tr.classList.add("highlight");
+      tr.innerHTML = `
+        <td>${formatBand(from, to)}</td>
+        <td>${(rate * 100).toFixed(0)}%</td>
+        <td>${money(taxable)}</td>
+        <td>${money(tax)}</td>
+      `;
+      tbody.appendChild(tr);
+    });
 
+    document.getElementById("bandBreakdownWrap").style.display = rows.length ? "block" : "none";
+  }
+
+  function resetAll() {
+    document.getElementById("price").value    = 300000;
+    document.getElementById("buyerType").value = "standard";
+    calculate();
+  }
+
+  document.getElementById("calcBtn").addEventListener("click", calculate);
+  document.getElementById("resetBtn").addEventListener("click", resetAll);
+
+  ["price","buyerType"].forEach(id => {
+    document.getElementById(id).addEventListener("input", calculate);
+    document.getElementById(id).addEventListener("change", calculate);
+    document.getElementById(id).addEventListener("keydown", (e) => {
+      if (e.key === "Enter") calculate();
+    });
+  });
+
+  document.getElementById("yearNow").textContent = new Date().getFullYear();
   calculate();
-
-}
-
-calcBtn.onclick = calculate;
-resetBtn.onclick = resetAll;
-
-yearNow.textContent = new Date().getFullYear();
-
-calculate();
-
 </script>
 
 </body>
