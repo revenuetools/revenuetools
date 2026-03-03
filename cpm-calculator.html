@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>CPM Calculator — Cost Per Thousand Impressions | CalcStack</title>
-  <meta name="description" content="Free CPM calculator. Calculate cost per thousand impressions instantly. Used for advertising, YouTube, marketing, and ad revenue analysis.">
+  <meta name="description" content="Free CPM calculator. Calculate cost per thousand impressions, total cost, or total impressions. Used for advertising, YouTube, marketing, and ad revenue analysis. Supports multiple currencies.">
 
   <link rel="canonical" href="https://calcstack.tools/cpm-calculator">
   <link rel="stylesheet" href="/css/styles.css">
@@ -17,49 +17,77 @@
     <h1 style="margin-bottom:8px;">CPM Calculator</h1>
 
     <p class="subtitle" style="max-width:720px;margin:0 auto 18px;">
-      Calculate cost per thousand impressions (CPM) quickly and accurately.
+      Calculate cost per thousand impressions (CPM), total cost, or total impressions — solve for any one value.
     </p>
 
     <div class="card" style="max-width:920px;margin:0 auto;">
 
       <div class="row">
+        <div>
+          <label for="currency">Currency</label>
+          <select id="currency">
+            <option value="GBP">GBP — British Pound (£)</option>
+            <option value="USD">USD — US Dollar ($)</option>
+            <option value="EUR">EUR — Euro (€)</option>
+            <option value="CAD">CAD — Canadian Dollar (CA$)</option>
+            <option value="AUD">AUD — Australian Dollar (A$)</option>
+            <option value="INR">INR — Indian Rupee (₹)</option>
+            <option value="BRL">BRL — Brazilian Real (R$)</option>
+            <option value="MXN">MXN — Mexican Peso (MX$)</option>
+            <option value="SGD">SGD — Singapore Dollar (S$)</option>
+            <option value="NZD">NZD — New Zealand Dollar (NZ$)</option>
+          </select>
+        </div>
 
         <div>
-          <label for="cost">Total cost (£)</label>
+          <label for="solveFor">Solve for</label>
+          <select id="solveFor">
+            <option value="cpm">CPM (cost per 1,000 impressions)</option>
+            <option value="cost">Total cost</option>
+            <option value="impressions">Total impressions</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div id="costRow">
+          <label for="cost">Total cost</label>
           <input id="cost" type="number" inputmode="decimal" min="0" step="0.01" value="100">
         </div>
 
-        <div>
+        <div id="impressionsRow">
           <label for="impressions">Total impressions</label>
           <input id="impressions" type="number" inputmode="numeric" min="0" step="1" value="50000">
         </div>
+      </div>
 
+      <div class="row" id="cpmRow">
+        <div>
+          <label for="cpmInput">CPM</label>
+          <input id="cpmInput" type="number" inputmode="decimal" min="0" step="0.01" value="2.00" style="display:none;">
+        </div>
       </div>
 
       <div class="actions" style="align-items:center;">
-        <button id="calcBtn" type="button">Calculate CPM</button>
+        <button id="calcBtn" type="button">Calculate</button>
         <button class="secondary" id="resetBtn" type="button">Reset</button>
         <a href="/" style="margin-left:6px;">Back to all tools</a>
       </div>
 
       <div class="results" style="margin-top:16px;">
-
         <div class="kpi">
-
           <div class="kpiBox">
-            <div class="label">CPM</div>
-            <div class="value" id="cpmOut">—</div>
-            <div class="muted">Cost per 1,000 impressions</div>
+            <div class="label" id="resultLabel">CPM</div>
+            <div class="value" id="resultOut">—</div>
+            <div class="muted" id="resultMuted">Cost per 1,000 impressions</div>
           </div>
-
         </div>
 
         <div class="muted" id="breakdown" style="margin-top:10px;"></div>
-
       </div>
 
       <div class="muted" style="margin-top:12px;font-size:12px;">
-        Formula: CPM = (Cost ÷ Impressions) × 1,000
+        Formula: CPM = (Total Cost ÷ Total Impressions) × 1,000
       </div>
 
     </div>
@@ -69,66 +97,100 @@
   </div>
 
 <script>
+  const money = (n) => {
+    const cur = document.getElementById("currency").value || "GBP";
+    const v = Number.isFinite(n) ? n : 0;
+    try {
+      return new Intl.NumberFormat(undefined, { style: "currency", currency: cur }).format(v);
+    } catch {
+      return v.toFixed(2) + " " + cur;
+    }
+  };
 
-const moneyGBP = (n) => {
-  const v = Number.isFinite(n) ? n : 0;
-  return new Intl.NumberFormat(undefined, {
-    style: "currency",
-    currency: "GBP"
-  }).format(v);
-};
+  const getVal = (id) => {
+    const v = parseFloat(document.getElementById(id).value);
+    return Number.isFinite(v) ? v : 0;
+  };
 
-const getVal = (id) => {
-  const v = parseFloat(document.getElementById(id).value);
-  return Number.isFinite(v) ? v : 0;
-};
+  function updateLayout() {
+    const solveFor = document.getElementById("solveFor").value;
+    const costInput        = document.getElementById("cost");
+    const impressionsInput = document.getElementById("impressions");
+    const cpmInput         = document.getElementById("cpmInput");
 
-function calculate(){
+    costInput.disabled        = solveFor === "cost";
+    impressionsInput.disabled = solveFor === "impressions";
+    cpmInput.style.display    = solveFor === "cpm" ? "none" : "block";
 
-  const cost = Math.max(0, getVal("cost"));
-  const impressions = Math.max(0, getVal("impressions"));
+    if (solveFor !== "cpm") {
+      document.getElementById("cpmRow").style.display = "block";
+    } else {
+      document.getElementById("cpmRow").style.display = "none";
+    }
 
-  let cpm = 0;
-
-  if(impressions > 0){
-    cpm = (cost / impressions) * 1000;
+    calculate();
   }
 
-  document.getElementById("cpmOut").textContent = moneyGBP(cpm);
+  function calculate() {
+    const solveFor    = document.getElementById("solveFor").value;
+    const cost        = Math.max(0, getVal("cost"));
+    const impressions = Math.max(0, getVal("impressions"));
+    const cpmIn       = Math.max(0, getVal("cpmInput"));
 
-  document.getElementById("breakdown").textContent =
-    `Cost: ${moneyGBP(cost)} · Impressions: ${impressions.toLocaleString()} · CPM: ${moneyGBP(cpm)}`;
+    let result = 0;
+    let label  = "";
+    let muted  = "";
 
-}
+    if (solveFor === "cpm") {
+      result = impressions > 0 ? (cost / impressions) * 1000 : 0;
+      label  = "CPM";
+      muted  = "Cost per 1,000 impressions";
+      document.getElementById("resultOut").textContent = money(result);
+      document.getElementById("breakdown").textContent =
+        `Cost: ${money(cost)} · Impressions: ${impressions.toLocaleString()} · CPM: ${money(result)}`;
+    } else if (solveFor === "cost") {
+      result = (cpmIn / 1000) * impressions;
+      label  = "Total cost";
+      muted  = "For your impressions at this CPM";
+      document.getElementById("resultOut").textContent = money(result);
+      document.getElementById("breakdown").textContent =
+        `CPM: ${money(cpmIn)} · Impressions: ${impressions.toLocaleString()} · Total cost: ${money(result)}`;
+    } else {
+      result = cpmIn > 0 ? (cost / cpmIn) * 1000 : 0;
+      label  = "Total impressions";
+      muted  = "Impressions your budget will buy";
+      document.getElementById("resultOut").textContent = Math.round(result).toLocaleString();
+      document.getElementById("breakdown").textContent =
+        `Cost: ${money(cost)} · CPM: ${money(cpmIn)} · Impressions: ${Math.round(result).toLocaleString()}`;
+    }
 
-function resetAll(){
+    document.getElementById("resultLabel").textContent = label;
+    document.getElementById("resultMuted").textContent = muted;
+  }
 
-  document.getElementById("cost").value = 100;
-  document.getElementById("impressions").value = 50000;
+  function resetAll() {
+    document.getElementById("currency").value    = "GBP";
+    document.getElementById("solveFor").value    = "cpm";
+    document.getElementById("cost").value        = 100;
+    document.getElementById("impressions").value = 50000;
+    document.getElementById("cpmInput").value    = 2.00;
+    updateLayout();
+  }
 
-  calculate();
+  document.getElementById("calcBtn").addEventListener("click", calculate);
+  document.getElementById("resetBtn").addEventListener("click", resetAll);
+  document.getElementById("solveFor").addEventListener("change", updateLayout);
 
-}
-
-document.getElementById("calcBtn").addEventListener("click", calculate);
-document.getElementById("resetBtn").addEventListener("click", resetAll);
-
-["cost","impressions"].forEach(id => {
-
-  document.getElementById(id).addEventListener("input", calculate);
-
-  document.getElementById(id).addEventListener("keydown", (e) => {
-
-    if(e.key === "Enter") calculate();
-
+  ["currency","cost","impressions","cpmInput"].forEach(id => {
+    document.getElementById(id).addEventListener("input", calculate);
+    document.getElementById(id).addEventListener("change", calculate);
+    document.getElementById(id).addEventListener("keydown", (e) => {
+      if (e.key === "Enter") calculate();
+    });
   });
 
-});
-
-document.getElementById("yearNow").textContent = new Date().getFullYear();
-
-calculate();
-
+  document.getElementById("yearNow").textContent = new Date().getFullYear();
+  updateLayout();
 </script>
 
 </body>
