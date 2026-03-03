@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>Patreon Earnings Calculator — Estimate Monthly & Yearly Income | CalcStack</title>
-  <meta name="description" content="Free Patreon earnings calculator. Estimate monthly and yearly income from members, average tier price, tips, and extras. Includes platform fee and expenses.">
+  <meta name="description" content="Free Patreon earnings calculator. Estimate monthly and yearly income from members, average tier price, tips, and extras. Includes platform fee and expenses. Supports multiple currencies.">
 
   <link rel="canonical" href="https://calcstack.tools/patreon-earnings-calculator">
   <link rel="stylesheet" href="/css/styles.css">
@@ -24,33 +24,51 @@
 
       <div class="row">
         <div>
+          <label for="currency">Currency</label>
+          <select id="currency">
+            <option value="GBP">GBP — British Pound (£)</option>
+            <option value="USD">USD — US Dollar ($)</option>
+            <option value="EUR">EUR — Euro (€)</option>
+            <option value="CAD">CAD — Canadian Dollar (CA$)</option>
+            <option value="AUD">AUD — Australian Dollar (A$)</option>
+            <option value="INR">INR — Indian Rupee (₹)</option>
+            <option value="BRL">BRL — Brazilian Real (R$)</option>
+            <option value="MXN">MXN — Mexican Peso (MX$)</option>
+            <option value="SGD">SGD — Singapore Dollar (S$)</option>
+            <option value="NZD">NZD — New Zealand Dollar (NZ$)</option>
+          </select>
+        </div>
+        <div>
           <label for="members">Paying members</label>
           <input id="members" type="number" inputmode="numeric" min="0" step="1" value="200" placeholder="e.g. 500">
         </div>
+      </div>
+
+      <div class="row">
         <div>
-          <label for="avgTier">Average tier price (£)</label>
+          <label for="avgTier">Average tier price</label>
           <input id="avgTier" type="number" inputmode="decimal" min="0" step="0.01" value="6.00" placeholder="e.g. 5.00">
         </div>
-      </div>
-
-      <div class="row">
         <div>
-          <label for="tips">Tips per month (£) <span class="hint">(optional)</span></label>
+          <label for="tips">Tips per month <span class="hint">optional</span></label>
           <input id="tips" type="number" inputmode="decimal" min="0" step="0.01" value="100" placeholder="e.g. 200">
         </div>
-        <div>
-          <label for="extras">Extras / merch / add-ons (£) <span class="hint">(optional)</span></label>
-          <input id="extras" type="number" inputmode="decimal" min="0" step="0.01" value="150" placeholder="e.g. 300">
-        </div>
       </div>
 
       <div class="row">
+        <div>
+          <label for="extras">Extras / merch / add-ons <span class="hint">optional</span></label>
+          <input id="extras" type="number" inputmode="decimal" min="0" step="0.01" value="150" placeholder="e.g. 300">
+        </div>
         <div>
           <label for="fee">Platform fee (%)</label>
           <input id="fee" type="number" inputmode="decimal" min="0" max="100" step="0.1" value="10" placeholder="e.g. 10">
         </div>
+      </div>
+
+      <div class="row">
         <div>
-          <label for="expenses">Monthly expenses (£) <span class="hint">(optional)</span></label>
+          <label for="expenses">Monthly expenses <span class="hint">optional</span></label>
           <input id="expenses" type="number" inputmode="decimal" min="0" step="0.01" value="0" placeholder="e.g. 150">
         </div>
       </div>
@@ -99,11 +117,12 @@
 
       <hr style="border:0;border-top:1px solid rgba(255,255,255,0.10);margin:18px 0;">
 
-<div class="muted" style="font-size:13px;line-height:1.6;">
-  Related calculators:
-  <a href="/creator-earnings-calculator">Creator Earnings Calculator</a> ·
-  <a href="/onlyfans-earnings-calculator">OnlyFans Earnings Calculator</a> ·
-</div>
+      <div class="muted" style="font-size:13px;line-height:1.6;">
+        Related calculators:
+        <a href="/creator-earnings-calculator">Creator Earnings Calculator</a> ·
+        <a href="/onlyfans-earnings-calculator">OnlyFans Earnings Calculator</a> ·
+        <a href="/twitch-earnings-calculator">Twitch Earnings Calculator</a>
+      </div>
 
     </div>
 
@@ -112,9 +131,14 @@
   </div>
 
 <script>
-  const moneyGBP = (n) => {
+  const money = (n) => {
+    const cur = document.getElementById("currency").value || "GBP";
     const v = Number.isFinite(n) ? n : 0;
-    return new Intl.NumberFormat(undefined, { style: "currency", currency: "GBP" }).format(v);
+    try {
+      return new Intl.NumberFormat(undefined, { style: "currency", currency: cur }).format(v);
+    } catch {
+      return v.toFixed(2) + " " + cur;
+    }
   };
 
   const getVal = (id) => {
@@ -122,49 +146,49 @@
     return Number.isFinite(v) ? v : 0;
   };
 
-  function calculate(){
-    const members = Math.max(0, getVal("members"));
-    const avgTier = Math.max(0, getVal("avgTier"));
-    const tips = Math.max(0, getVal("tips"));
-    const extras = Math.max(0, getVal("extras"));
-    const feePct = Math.min(100, Math.max(0, getVal("fee")));
+  function calculate() {
+    const members  = Math.max(0, getVal("members"));
+    const avgTier  = Math.max(0, getVal("avgTier"));
+    const tips     = Math.max(0, getVal("tips"));
+    const extras   = Math.max(0, getVal("extras"));
+    const feePct   = Math.min(100, Math.max(0, getVal("fee")));
     const expenses = Math.max(0, getVal("expenses"));
 
     const grossMembers = members * avgTier;
-    const gross = grossMembers + tips + extras;
+    const gross        = grossMembers + tips + extras;
+    const fee          = gross * (feePct / 100);
+    const monthlyNet   = Math.max(0, gross - fee - expenses);
+    const yearlyNet    = monthlyNet * 12;
 
-    const fee = gross * (feePct / 100);
-    const netBeforeExpenses = gross - fee;
-    const monthlyNet = Math.max(0, netBeforeExpenses - expenses);
-    const yearlyNet = monthlyNet * 12;
-
-    document.getElementById("monthlyOut").textContent = moneyGBP(monthlyNet);
-    document.getElementById("yearlyOut").textContent = moneyGBP(yearlyNet);
-    document.getElementById("grossOut").textContent = moneyGBP(gross);
-    document.getElementById("feeOut").textContent = moneyGBP(fee);
+    document.getElementById("monthlyOut").textContent = money(monthlyNet);
+    document.getElementById("yearlyOut").textContent  = money(yearlyNet);
+    document.getElementById("grossOut").textContent   = money(gross);
+    document.getElementById("feeOut").textContent     = money(fee);
 
     document.getElementById("breakdown").textContent =
-      `Gross: ${moneyGBP(gross)} (Members: ${moneyGBP(grossMembers)}, Tips: ${moneyGBP(tips)}, Extras: ${moneyGBP(extras)}) · ` +
-      `Fee (${feePct}%): ${moneyGBP(fee)} · Expenses: ${moneyGBP(expenses)} · Net: ${moneyGBP(monthlyNet)}`;
+      `Gross: ${money(gross)} (Members: ${money(grossMembers)}, Tips: ${money(tips)}, Extras: ${money(extras)}) · ` +
+      `Fee (${feePct}%): ${money(fee)} · Expenses: ${money(expenses)} · Net: ${money(monthlyNet)}`;
   }
 
-  function resetAll(){
-    document.getElementById("members").value = 200;
-    document.getElementById("avgTier").value = 6.00;
-    document.getElementById("tips").value = 100;
-    document.getElementById("extras").value = 150;
-    document.getElementById("fee").value = 10;
-    document.getElementById("expenses").value = 0;
+  function resetAll() {
+    document.getElementById("currency").value  = "GBP";
+    document.getElementById("members").value   = 200;
+    document.getElementById("avgTier").value   = 6.00;
+    document.getElementById("tips").value      = 100;
+    document.getElementById("extras").value    = 150;
+    document.getElementById("fee").value       = 10;
+    document.getElementById("expenses").value  = 0;
     calculate();
   }
 
   document.getElementById("calcBtn").addEventListener("click", calculate);
   document.getElementById("resetBtn").addEventListener("click", resetAll);
 
-  ["members","avgTier","tips","extras","fee","expenses"].forEach(id => {
+  ["currency","members","avgTier","tips","extras","fee","expenses"].forEach(id => {
     document.getElementById(id).addEventListener("input", calculate);
+    document.getElementById(id).addEventListener("change", calculate);
     document.getElementById(id).addEventListener("keydown", (e) => {
-      if(e.key === "Enter") calculate();
+      if (e.key === "Enter") calculate();
     });
   });
 
