@@ -5,13 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>Income Tax Calculator (UK) — Take Home Pay After Tax & NI | CalcStack</title>
-  <meta name="description" content="Free UK income tax calculator. Estimate take-home pay after Income Tax and National Insurance for England, Wales, Northern Ireland, or Scotland.">
+  <meta name="description" content="Free UK income tax calculator. Estimate take-home pay after Income Tax, National Insurance, and student loan repayments for England, Wales, Northern Ireland, or Scotland. 2025-26 tax year.">
 
   <link rel="canonical" href="https://calcstack.tools/income-tax-calculator-uk">
   <link rel="stylesheet" href="/css/styles.css">
 
   <style>
-    /* Small helper so dropdown matches inputs (kept local to this page) */
     select{
       width:100%;
       padding:12px 12px;
@@ -34,7 +33,7 @@
     <h1 style="margin-bottom:8px;">Income Tax Calculator (UK)</h1>
 
     <p class="subtitle" style="max-width:920px;margin:0 auto 18px;">
-      Estimate take-home pay after <b>Income Tax</b> and <b>National Insurance</b> (2025–26 tax year).
+      Estimate take-home pay after <b>Income Tax</b>, <b>National Insurance</b>, and optional student loan repayments (2025–26 tax year).
     </p>
 
     <div class="card" style="max-width:920px;margin:0 auto;">
@@ -56,7 +55,7 @@
 
       <div class="row">
         <div>
-          <label for="pension">Pension contribution (£ per year) <span class="hint">(optional)</span></label>
+          <label for="pension">Pension contribution (£ per year) <span class="hint">optional</span></label>
           <input id="pension" type="number" inputmode="decimal" min="0" step="0.01" value="0" placeholder="e.g. 2000">
           <div class="muted" style="font-size:12px;margin-top:6px;">
             Simple model: subtracts pension from taxable pay (does not model salary sacrifice nuances).
@@ -64,8 +63,22 @@
         </div>
 
         <div>
-          <label for="otherDed">Other deductions (£ per year) <span class="hint">(optional)</span></label>
+          <label for="otherDed">Other deductions (£ per year) <span class="hint">optional</span></label>
           <input id="otherDed" type="number" inputmode="decimal" min="0" step="0.01" value="0" placeholder="e.g. 500">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="studentLoan">Student loan plan <span class="hint">optional</span></label>
+          <select id="studentLoan">
+            <option value="none">None</option>
+            <option value="plan1">Plan 1 — threshold £24,990 (9%)</option>
+            <option value="plan2">Plan 2 — threshold £27,295 (9%)</option>
+            <option value="plan4">Plan 4 (Scotland) — threshold £31,395 (9%)</option>
+            <option value="plan5">Plan 5 — threshold £25,000 (9%)</option>
+            <option value="postgrad">Postgraduate — threshold £21,000 (6%)</option>
+          </select>
         </div>
       </div>
 
@@ -81,7 +94,7 @@
           <div class="kpiBox">
             <div class="label">Take-home (annual)</div>
             <div class="value" id="netAnnualOut">—</div>
-            <div class="muted">After Income Tax + NI</div>
+            <div class="muted">After tax, NI & deductions</div>
           </div>
 
           <div class="kpiBox">
@@ -102,16 +115,21 @@
             <div class="muted">Employee NI (Class 1)</div>
           </div>
 
+          <div class="kpiBox" id="slBox" style="display:none;">
+            <div class="label">Student Loan</div>
+            <div class="value" id="slOut">—</div>
+            <div class="muted">Annual repayment</div>
+          </div>
+
         </div>
 
         <div class="muted" id="breakdown" style="margin-top:10px;"></div>
       </div>
 
       <div class="muted" style="margin-top:12px;font-size:12px;line-height:1.5;">
-        Notes: This is an estimate for standard employment income. It does not include student loan, benefits, dividends, savings tax, or special tax codes.
+        Notes: This is an estimate for standard employment income. It does not include benefits, dividends, savings tax, or special tax codes. Student loan thresholds are for 2025–26.
       </div>
 
-      <!-- RELATED CALCULATORS -->
       <hr style="border:0;border-top:1px solid rgba(255,255,255,0.10);margin:18px 0;">
       <div class="muted" style="font-size:13px;line-height:1.6;">
         Related calculators:
@@ -135,26 +153,29 @@
     return Number.isFinite(v) ? v : 0;
   };
 
-  function personalAllowance(income){
-    // 2025–26: PA £12,570, reduced £1 per £2 over £100k, down to £0 at £125,140
+  const STUDENT_LOAN_PLANS = {
+    none:     { threshold: 0,     rate: 0    },
+    plan1:    { threshold: 24990, rate: 0.09 },
+    plan2:    { threshold: 27295, rate: 0.09 },
+    plan4:    { threshold: 31395, rate: 0.09 },
+    plan5:    { threshold: 25000, rate: 0.09 },
+    postgrad: { threshold: 21000, rate: 0.06 },
+  };
+
+  function personalAllowance(income) {
     const PA = 12570;
-    if(income <= 100000) return PA;
+    if (income <= 100000) return PA;
     const reduction = (income - 100000) / 2;
     return Math.max(0, PA - reduction);
   }
 
-  function tax_rUK(taxable, PA){
-    // England/Wales/NI 2025–26 bands:
-    // 20% on first £37,700 taxable
-    // 40% up to additional threshold (total income £125,140)
-    // 45% above that
+  function tax_rUK(taxable, PA) {
     const BASIC_LIMIT = 37700;
     const ADDITIONAL_TOTAL = 125140;
     const higherUpperTaxable = Math.max(0, ADDITIONAL_TOTAL - PA);
 
     let t = 0;
-
-    const basicPart = Math.min(taxable, BASIC_LIMIT);
+    const basicPart  = Math.min(taxable, BASIC_LIMIT);
     t += basicPart * 0.20;
 
     const higherPart = Math.min(Math.max(0, taxable - BASIC_LIMIT), Math.max(0, higherUpperTaxable - BASIC_LIMIT));
@@ -166,99 +187,96 @@
     return t;
   }
 
-  function tax_scotland(taxable, PA){
-    // Scotland 2025–26 taxable bands above PA:
-    // Starter: up to £2,827 @ 19%
-    // Basic: up to £14,921 @ 20%
-    // Intermediate: up to £31,092 @ 21%
-    // Higher: up to £62,430 @ 42%
-    // Advanced: up to total income £125,140 => taxable up to (125,140 - PA) @ 45%
-    // Top: above that @ 48%
+  function tax_scotland(taxable, PA) {
     const bands = [
       { upto: 2827,  rate: 0.19 },
       { upto: 14921, rate: 0.20 },
       { upto: 31092, rate: 0.21 },
       { upto: 62430, rate: 0.42 },
     ];
-
     const TOP_TOTAL = 125140;
-    const advUpper = Math.max(0, TOP_TOTAL - PA);
+    const advUpper  = Math.max(0, TOP_TOTAL - PA);
 
-    let t = 0;
-    let prev = 0;
-
-    for(const b of bands){
+    let t = 0, prev = 0;
+    for (const b of bands) {
       const part = Math.max(0, Math.min(taxable, b.upto) - prev);
       t += part * b.rate;
       prev = b.upto;
     }
-
-    // Advanced band (45%) up to advUpper
     const advPart = Math.max(0, Math.min(taxable, advUpper) - prev);
     t += advPart * 0.45;
-    prev = Math.min(Math.max(prev, prev), advUpper);
-
-    // Top band (48%) above advUpper
     const topPart = Math.max(0, taxable - advUpper);
     t += topPart * 0.48;
-
     return t;
   }
 
-  function employeeNI(income){
-    // Class 1 employee NI 2025–26:
-    // 0% up to £12,570 (PT)
-    // 8% between £12,570 and £50,270 (UEL)
-    // 2% above £50,270
-    const PT = 12570;
+  function employeeNI(income) {
+    const PT  = 12570;
     const UEL = 50270;
-
-    const main = Math.max(0, Math.min(income, UEL) - PT) * 0.08;
+    const main  = Math.max(0, Math.min(income, UEL) - PT) * 0.08;
     const upper = Math.max(0, income - UEL) * 0.02;
     return main + upper;
   }
 
-  function calculate(){
-    const income = Math.max(0, getVal("income"));
-    const pension = Math.max(0, getVal("pension"));
-    const otherDed = Math.max(0, getVal("otherDed"));
-    const region = document.getElementById("region").value;
+  function studentLoanRepayment(income, plan) {
+    const p = STUDENT_LOAN_PLANS[plan] || STUDENT_LOAN_PLANS.none;
+    return Math.max(0, income - p.threshold) * p.rate;
+  }
+
+  function calculate() {
+    const income    = Math.max(0, getVal("income"));
+    const pension   = Math.max(0, getVal("pension"));
+    const otherDed  = Math.max(0, getVal("otherDed"));
+    const region    = document.getElementById("region").value;
+    const slPlan    = document.getElementById("studentLoan").value;
 
     const adjustedIncome = Math.max(0, income - pension - otherDed);
-
-    const PA = personalAllowance(adjustedIncome);
+    const PA      = personalAllowance(adjustedIncome);
     const taxable = Math.max(0, adjustedIncome - PA);
 
     const tax = region === "SCT" ? tax_scotland(taxable, PA) : tax_rUK(taxable, PA);
-    const ni = employeeNI(adjustedIncome);
+    const ni  = employeeNI(adjustedIncome);
+    const sl  = studentLoanRepayment(adjustedIncome, slPlan);
 
-    const netAnnual = Math.max(0, adjustedIncome - tax - ni);
+    const netAnnual  = Math.max(0, adjustedIncome - tax - ni - sl);
     const netMonthly = netAnnual / 12;
 
-    document.getElementById("taxOut").textContent = money(tax);
-    document.getElementById("niOut").textContent = money(ni);
-    document.getElementById("netAnnualOut").textContent = money(netAnnual);
+    document.getElementById("taxOut").textContent       = money(tax);
+    document.getElementById("niOut").textContent        = money(ni);
+    document.getElementById("netAnnualOut").textContent  = money(netAnnual);
     document.getElementById("netMonthlyOut").textContent = money(netMonthly);
 
+    const slBox = document.getElementById("slBox");
+    if (slPlan !== "none") {
+      slBox.style.display = "block";
+      document.getElementById("slOut").textContent = money(sl);
+    } else {
+      slBox.style.display = "none";
+    }
+
     document.getElementById("breakdown").textContent =
-      `Gross: ${money(income)} · Adjusted: ${money(adjustedIncome)} · Personal Allowance: ${money(PA)} · Taxable: ${money(taxable)} · Region: ${region === "SCT" ? "Scotland" : "England/Wales/NI"}`;
+      `Gross: ${money(income)} · Adjusted: ${money(adjustedIncome)} · Personal Allowance: ${money(PA)} · ` +
+      `Taxable: ${money(taxable)} · Tax: ${money(tax)} · NI: ${money(ni)}` +
+      (slPlan !== "none" ? ` · Student Loan: ${money(sl)}` : "") +
+      ` · Take-home: ${money(netAnnual)}`;
   }
 
-  function resetAll(){
-    document.getElementById("income").value = 45000;
-    document.getElementById("region").value = "rUK";
-    document.getElementById("pension").value = 0;
-    document.getElementById("otherDed").value = 0;
+  function resetAll() {
+    document.getElementById("income").value      = 45000;
+    document.getElementById("region").value      = "rUK";
+    document.getElementById("pension").value     = 0;
+    document.getElementById("otherDed").value    = 0;
+    document.getElementById("studentLoan").value = "none";
     calculate();
   }
 
   document.getElementById("calcBtn").addEventListener("click", calculate);
   document.getElementById("resetBtn").addEventListener("click", resetAll);
 
-  ["income","region","pension","otherDed"].forEach(id => {
+  ["income","region","pension","otherDed","studentLoan"].forEach(id => {
     document.getElementById(id).addEventListener("input", calculate);
     document.getElementById(id).addEventListener("change", calculate);
-    document.getElementById(id).addEventListener("keydown", (e) => { if(e.key === "Enter") calculate(); });
+    document.getElementById(id).addEventListener("keydown", (e) => { if (e.key === "Enter") calculate(); });
   });
 
   document.getElementById("yearNow").textContent = new Date().getFullYear();
