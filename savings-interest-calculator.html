@@ -5,10 +5,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>Savings Interest Calculator — Compound Growth & Final Balance | CalcStack</title>
-  <meta name="description" content="Free savings interest calculator. Estimate final balance, total interest earned, and growth with compound interest and optional monthly contributions.">
+  <meta name="description" content="Free savings interest calculator. Estimate final balance, total interest earned, and growth with compound interest and optional monthly contributions. Supports multiple currencies.">
 
   <link rel="canonical" href="https://calcstack.tools/savings-interest-calculator">
   <link rel="stylesheet" href="/css/styles.css">
+
+  <style>
+    select {
+      width: 100%;
+      padding: 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(17,24,39,0.85);
+      color: var(--text);
+      outline: none;
+    }
+    select:focus {
+      border-color: rgba(56,189,248,0.7);
+      box-shadow: 0 0 0 3px rgba(56,189,248,0.18);
+    }
+  </style>
 </head>
 
 <body class="page">
@@ -24,40 +40,60 @@
 
       <div class="row">
         <div>
-          <label for="start">Starting balance (£)</label>
-          <input id="start" type="number" inputmode="decimal" min="0" step="0.01" value="5000">
+          <label for="currency">Currency</label>
+          <select id="currency">
+            <option value="GBP">GBP — British Pound (£)</option>
+            <option value="USD">USD — US Dollar ($)</option>
+            <option value="EUR">EUR — Euro (€)</option>
+            <option value="CAD">CAD — Canadian Dollar (CA$)</option>
+            <option value="AUD">AUD — Australian Dollar (A$)</option>
+            <option value="INR">INR — Indian Rupee (₹)</option>
+            <option value="BRL">BRL — Brazilian Real (R$)</option>
+            <option value="MXN">MXN — Mexican Peso (MX$)</option>
+            <option value="SGD">SGD — Singapore Dollar (S$)</option>
+            <option value="NZD">NZD — New Zealand Dollar (NZ$)</option>
+          </select>
         </div>
 
+        <div>
+          <label for="start">Starting balance</label>
+          <input id="start" type="number" inputmode="decimal" min="0" step="0.01" value="5000">
+        </div>
+      </div>
+
+      <div class="row">
         <div>
           <label for="rate">Interest rate (AER/APR %)</label>
           <input id="rate" type="number" inputmode="decimal" min="0" step="0.01" value="4.50">
         </div>
+
+        <div>
+          <label for="monthly">Monthly contribution <span class="hint">optional</span></label>
+          <input id="monthly" type="number" inputmode="decimal" min="0" step="0.01" value="200">
+        </div>
       </div>
 
       <div class="row">
-        <div>
-          <label for="monthly">Monthly contribution (£) <span class="hint">optional</span></label>
-          <input id="monthly" type="number" inputmode="decimal" min="0" step="0.01" value="200">
-        </div>
-
         <div>
           <label for="years">Time (years)</label>
           <input id="years" type="number" inputmode="decimal" min="0" step="0.5" value="5">
         </div>
+
+        <div>
+          <label for="compound">Compounding frequency</label>
+          <select id="compound">
+            <option value="1">Yearly</option>
+            <option value="4">Quarterly</option>
+            <option value="12" selected>Monthly</option>
+            <option value="365">Daily</option>
+          </select>
+        </div>
       </div>
 
       <div class="row">
         <div>
-          <label for="compound">Compounding</label>
-          <input id="compound" type="number" inputmode="numeric" min="1" step="1" value="12">
-          <div class="muted" style="font-size:12px;margin-top:6px;">
-            Enter 12 for monthly, 4 for quarterly, 1 for yearly.
-          </div>
-        </div>
-
-        <div>
-          <label for="contribTiming">Contribution timing (monthly)</label>
-          <select id="contribTiming" style="width:100%;height:44px;border-radius:10px;border:1px solid rgba(255,255,255,0.14);background: rgba(17,24,39,0.85);color:var(--text);outline:none;padding:0 12px;">
+          <label for="contribTiming">Contribution timing</label>
+          <select id="contribTiming">
             <option value="end" selected>End of month (typical)</option>
             <option value="start">Start of month (slightly higher)</option>
           </select>
@@ -113,76 +149,70 @@
   </div>
 
 <script>
-  const moneyGBP = (n) => {
+  const money = (n) => {
+    const cur = document.getElementById("currency").value || "GBP";
     const v = Number.isFinite(n) ? n : 0;
-    return new Intl.NumberFormat(undefined, { style: "currency", currency: "GBP" }).format(v);
+    try {
+      return new Intl.NumberFormat(undefined, { style: "currency", currency: cur }).format(v);
+    } catch {
+      return v.toFixed(2) + " " + cur;
+    }
   };
 
-  const fmtRatio = (n) => {
-    const v = Number.isFinite(n) ? n : 0;
-    return v.toFixed(2) + "×";
-  };
+  const fmtRatio = (n) => (Number.isFinite(n) ? n : 0).toFixed(2) + "×";
 
   const getVal = (id) => {
     const v = parseFloat(document.getElementById(id).value);
     return Number.isFinite(v) ? v : 0;
   };
 
-  function calculate(){
-    const start = Math.max(0, getVal("start"));
-    const ratePct = Math.max(0, getVal("rate"));
-    const monthly = Math.max(0, getVal("monthly"));
-    const years = Math.max(0, getVal("years"));
+  function calculate() {
+    const start    = Math.max(0, getVal("start"));
+    const ratePct  = Math.max(0, getVal("rate"));
+    const monthly  = Math.max(0, getVal("monthly"));
+    const years    = Math.max(0, getVal("years"));
     const compound = Math.max(1, Math.round(getVal("compound")));
-    const timing = document.getElementById("contribTiming").value;
+    const timing   = document.getElementById("contribTiming").value;
 
-    const months = Math.max(0, Math.round(years * 12));
-    const rAnnual = ratePct / 100;
-
-    // We'll simulate monthly steps for contributions clarity.
-    // Interest accrues based on annual rate converted to monthly equivalent from compounding frequency.
-    // Approx: effective periodic rate = rAnnual / compound; applied compound times/year.
-    // For monthly simulation, convert to an effective monthly rate:
-    // monthlyRate = (1 + rAnnual/compound)^(compound/12) - 1
+    const months      = Math.max(0, Math.round(years * 12));
+    const rAnnual     = ratePct / 100;
     const monthlyRate = Math.pow(1 + (rAnnual / compound), compound / 12) - 1;
 
-    let balance = start;
+    let balance    = start;
     let contributed = start;
 
-    for(let i=0; i<months; i++){
-      if (timing === "start" && monthly > 0){
-        balance += monthly;
+    for (let i = 0; i < months; i++) {
+      if (timing === "start" && monthly > 0) {
+        balance     += monthly;
         contributed += monthly;
       }
-
-      // interest for the month
       balance *= (1 + monthlyRate);
-
-      if (timing === "end" && monthly > 0){
-        balance += monthly;
+      if (timing === "end" && monthly > 0) {
+        balance     += monthly;
         contributed += monthly;
       }
     }
 
     const interestEarned = balance - contributed;
-    const growth = start > 0 ? (balance / start) : (balance > 0 ? Infinity : 0);
+    const growth         = start > 0 ? (balance / start) : (balance > 0 ? Infinity : 0);
 
-    document.getElementById("finalOut").textContent = moneyGBP(balance);
-    document.getElementById("contribOut").textContent = moneyGBP(contributed);
-    document.getElementById("interestOut").textContent = moneyGBP(interestEarned);
-    document.getElementById("growthOut").textContent = (Number.isFinite(growth) ? fmtRatio(growth) : "—");
+    document.getElementById("finalOut").textContent    = money(balance);
+    document.getElementById("contribOut").textContent  = money(contributed);
+    document.getElementById("interestOut").textContent = money(interestEarned);
+    document.getElementById("growthOut").textContent   = Number.isFinite(growth) ? fmtRatio(growth) : "—";
 
     document.getElementById("breakdown").textContent =
-      `Start: ${moneyGBP(start)} · Rate: ${ratePct.toFixed(2)}% · Monthly: ${moneyGBP(monthly)} · ` +
+      `Start: ${money(start)} · Rate: ${ratePct.toFixed(2)}% · Monthly: ${money(monthly)} · ` +
       `Time: ${months.toLocaleString()} months · Compounding: ${compound}/year · Timing: ${timing === "start" ? "start" : "end"} of month`;
   }
 
-  function resetAll(){
-    document.getElementById("start").value = 5000;
-    document.getElementById("rate").value = 4.50;
-    document.getElementById("monthly").value = 200;
-    document.getElementById("years").value = 5;
-    document.getElementById("compound").value = 12;
+  function resetAll() {
+    document.getElementById("currency").value      = "GBP";
+    document.getElementById("start").value         = 5000;
+    document.getElementById("rate").value          = 4.50;
+    document.getElementById("monthly").value       = 200;
+    document.getElementById("years").value         = 5;
+    document.getElementById("compound").value      = 12;
     document.getElementById("contribTiming").value = "end";
     calculate();
   }
@@ -190,11 +220,11 @@
   document.getElementById("calcBtn").addEventListener("click", calculate);
   document.getElementById("resetBtn").addEventListener("click", resetAll);
 
-  ["start","rate","monthly","years","compound","contribTiming"].forEach(id => {
+  ["currency","start","rate","monthly","years","compound","contribTiming"].forEach(id => {
     document.getElementById(id).addEventListener("input", calculate);
     document.getElementById(id).addEventListener("change", calculate);
     document.getElementById(id).addEventListener("keydown", (e) => {
-      if(e.key === "Enter") calculate();
+      if (e.key === "Enter") calculate();
     });
   });
 
