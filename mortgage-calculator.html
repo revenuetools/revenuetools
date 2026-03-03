@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>Mortgage Calculator — Monthly Payments & Interest | CalcStack</title>
-  <meta name="description" content="Free mortgage calculator. Estimate monthly mortgage payments, total interest, and total cost based on loan amount, interest rate, and term.">
+  <meta name="description" content="Free mortgage calculator. Estimate monthly mortgage payments, total interest, and total cost based on property value, deposit, interest rate, and term. Supports multiple currencies.">
 
   <link rel="canonical" href="https://calcstack.tools/mortgage-calculator">
   <link rel="stylesheet" href="/css/styles.css">
@@ -23,34 +23,65 @@
     <div class="card" style="max-width:920px;margin:0 auto;">
 
       <div class="row">
-
         <div>
-          <label for="loan">Loan amount (£)</label>
-          <input id="loan" type="number" value="200000" min="0" step="0.01">
+          <label for="currency">Currency</label>
+          <select id="currency">
+            <option value="GBP">GBP — British Pound (£)</option>
+            <option value="USD">USD — US Dollar ($)</option>
+            <option value="EUR">EUR — Euro (€)</option>
+            <option value="CAD">CAD — Canadian Dollar (CA$)</option>
+            <option value="AUD">AUD — Australian Dollar (A$)</option>
+            <option value="INR">INR — Indian Rupee (₹)</option>
+            <option value="BRL">BRL — Brazilian Real (R$)</option>
+            <option value="MXN">MXN — Mexican Peso (MX$)</option>
+            <option value="SGD">SGD — Singapore Dollar (S$)</option>
+            <option value="NZD">NZD — New Zealand Dollar (NZ$)</option>
+          </select>
         </div>
 
+        <div>
+          <label for="propertyValue">Property value <span class="hint">optional</span></label>
+          <input id="propertyValue" type="number" value="250000" min="0" step="0.01" placeholder="e.g. 250000">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="deposit">Deposit <span class="hint">optional</span></label>
+          <input id="deposit" type="number" value="50000" min="0" step="0.01" placeholder="e.g. 50000">
+        </div>
+
+        <div>
+          <label for="loan">Loan amount
+            <span class="hint" id="ltvHint" style="margin-left:6px;"></span>
+          </label>
+          <input id="loan" type="number" value="200000" min="0" step="0.01">
+        </div>
+      </div>
+
+      <div class="row">
         <div>
           <label for="rate">Interest rate (% per year)</label>
           <input id="rate" type="number" value="5" min="0" step="0.01">
         </div>
 
-      </div>
-
-      <div class="row">
-
         <div>
           <label for="years">Loan term (years)</label>
           <input id="years" type="number" value="25" min="0" step="1">
         </div>
+      </div>
 
+      <div class="row">
+        <div>
+          <label for="overpayment">Monthly overpayment <span class="hint">optional</span></label>
+          <input id="overpayment" type="number" value="0" min="0" step="0.01" placeholder="e.g. 100">
+        </div>
       </div>
 
       <div class="actions">
-
         <button id="calcBtn">Calculate</button>
         <button class="secondary" id="resetBtn">Reset</button>
         <a href="/" style="margin-left:6px;">Back to all tools</a>
-
       </div>
 
       <div class="results">
@@ -76,9 +107,9 @@
           </div>
 
           <div class="kpiBox">
-            <div class="label">Loan term</div>
-            <div class="value" id="monthsOut">—</div>
-            <div class="muted">Total months</div>
+            <div class="label">Payoff time</div>
+            <div class="value" id="payoffOut">—</div>
+            <div class="muted">With overpayment if set</div>
           </div>
 
         </div>
@@ -91,14 +122,13 @@
         Mortgage estimates may vary depending on lender terms, fees, and insurance.
       </div>
 
-      <!-- RELATED CALCULATORS -->
       <hr style="border:0;border-top:1px solid rgba(255,255,255,0.10);margin:18px 0;">
 
       <div class="muted" style="font-size:13px;line-height:1.6;">
         Related calculators:
         <a href="/loan-calculator">Loan Calculator</a> ·
+        <a href="/stamp-duty-calculator-uk">Stamp Duty Calculator (UK)</a> ·
         <a href="/compound-interest-calculator">Compound Interest Calculator</a> ·
-        <a href="/salary-to-hourly-calculator">Salary Calculator</a> ·
         <a href="/percentage-calculator">Percentage Calculator</a>
       </div>
 
@@ -111,56 +141,118 @@
   </div>
 
 <script>
+  const money = (n) => {
+    const cur = document.getElementById("currency").value || "GBP";
+    const v = Number.isFinite(n) ? n : 0;
+    try {
+      return new Intl.NumberFormat(undefined, { style: "currency", currency: cur }).format(v);
+    } catch {
+      return v.toFixed(2) + " " + cur;
+    }
+  };
 
-const money = n =>
-  new Intl.NumberFormat(undefined,{
-    style:"currency",
-    currency:"GBP"
-  }).format(n);
+  const getVal = (id) => parseFloat(document.getElementById(id).value) || 0;
 
-const getVal = id =>
-  parseFloat(document.getElementById(id).value) || 0;
+  function formatMonths(m) {
+    if (!Number.isFinite(m) || m <= 0) return "—";
+    const years  = Math.floor(m / 12);
+    const months = m % 12;
+    if (years === 0)  return `${months} months`;
+    if (months === 0) return `${years} years`;
+    return `${years}y ${months}m`;
+  }
 
-function calculate(){
+  function payoffWithOverpayment(P, annualRatePct, basePayment, extra) {
+    const r   = Math.max(0, annualRatePct) / 100 / 12;
+    const pay = Math.max(0, basePayment + extra);
+    if (P <= 0)   return 0;
+    if (pay <= 0) return Infinity;
 
-  const P = getVal("loan");
-  const r = getVal("rate") / 100 / 12;
-  const n = getVal("years") * 12;
+    let balance = P, months = 0;
+    const cap = 1200;
 
-  const monthly =
-    P * r * Math.pow(1+r, n) /
-    (Math.pow(1+r, n) - 1);
+    while (balance > 0.005 && months < cap) {
+      const interest    = balance * r;
+      let principal     = pay - interest;
+      if (principal <= 0) return Infinity;
+      if (principal > balance) principal = balance;
+      balance -= principal;
+      months++;
+    }
+    return months;
+  }
 
-  const total = monthly * n;
-  const interest = total - P;
+  // Auto-update loan amount when property value or deposit changes
+  function syncLoan() {
+    const pv      = Math.max(0, getVal("propertyValue"));
+    const deposit = Math.max(0, getVal("deposit"));
+    if (pv > 0) {
+      const loanVal = Math.max(0, pv - deposit);
+      document.getElementById("loan").value = loanVal.toFixed(2);
+      const ltv = pv > 0 ? ((loanVal / pv) * 100).toFixed(1) : 0;
+      document.getElementById("ltvHint").textContent = pv > 0 ? `LTV: ${ltv}%` : "";
+    }
+    calculate();
+  }
 
-  monthlyOut.textContent = money(monthly);
-  totalOut.textContent = money(total);
-  interestOut.textContent = money(interest);
-  monthsOut.textContent = n.toLocaleString();
+  function calculate() {
+    const P    = Math.max(0, getVal("loan"));
+    const r    = Math.max(0, getVal("rate")) / 100 / 12;
+    const n    = Math.max(0, getVal("years")) * 12;
+    const over = Math.max(0, getVal("overpayment"));
 
-  breakdown.textContent =
-    `Loan: ${money(P)} · Rate: ${(r*12*100).toFixed(2)}% · Term: ${n} months`;
+    if (P === 0 || n === 0) return;
 
-}
+    const monthly  = r === 0 ? P / n : P * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1);
+    const total    = monthly * n;
+    const interest = total - P;
 
-function resetAll(){
+    document.getElementById("monthlyOut").textContent  = money(monthly);
+    document.getElementById("totalOut").textContent    = money(total);
+    document.getElementById("interestOut").textContent = money(interest);
 
-  loan.value = 200000;
-  rate.value = 5;
-  years.value = 25;
+    if (over > 0) {
+      const payoffMonths = payoffWithOverpayment(P, getVal("rate"), monthly, over);
+      document.getElementById("payoffOut").textContent = formatMonths(payoffMonths);
+    } else {
+      document.getElementById("payoffOut").textContent = formatMonths(n);
+    }
 
+    document.getElementById("breakdown").textContent =
+      `Loan: ${money(P)} · Rate: ${(getVal("rate")).toFixed(2)}% · Term: ${n} months · ` +
+      `Monthly: ${money(monthly)}${over > 0 ? ` · Overpayment: ${money(over)}/mo` : ""}`;
+  }
+
+  function resetAll() {
+    document.getElementById("currency").value      = "GBP";
+    document.getElementById("propertyValue").value = 250000;
+    document.getElementById("deposit").value       = 50000;
+    document.getElementById("loan").value          = 200000;
+    document.getElementById("rate").value          = 5;
+    document.getElementById("years").value         = 25;
+    document.getElementById("overpayment").value   = 0;
+    document.getElementById("ltvHint").textContent = "LTV: 80.0%";
+    calculate();
+  }
+
+  document.getElementById("calcBtn").addEventListener("click", calculate);
+  document.getElementById("resetBtn").addEventListener("click", resetAll);
+
+  ["propertyValue","deposit"].forEach(id => {
+    document.getElementById(id).addEventListener("input", syncLoan);
+    document.getElementById(id).addEventListener("change", syncLoan);
+  });
+
+  ["currency","loan","rate","years","overpayment"].forEach(id => {
+    document.getElementById(id).addEventListener("input", calculate);
+    document.getElementById(id).addEventListener("change", calculate);
+    document.getElementById(id).addEventListener("keydown", (e) => {
+      if (e.key === "Enter") calculate();
+    });
+  });
+
+  document.getElementById("yearNow").textContent = new Date().getFullYear();
   calculate();
-
-}
-
-calcBtn.onclick = calculate;
-resetBtn.onclick = resetAll;
-
-yearNow.textContent = new Date().getFullYear();
-
-calculate();
-
 </script>
 
 </body>
