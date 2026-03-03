@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>ROI Calculator — Return on Investment Calculator | CalcStack</title>
-  <meta name="description" content="Free ROI calculator. Calculate return on investment, profit, and percentage return instantly. Perfect for business, marketing, crypto, and investing.">
+  <meta name="description" content="Free ROI calculator. Calculate return on investment, profit, percentage return, and annualised ROI instantly. Perfect for business, marketing, and investing. Supports multiple currencies.">
 
   <link rel="canonical" href="https://calcstack.tools/roi-calculator">
   <link rel="stylesheet" href="/css/styles.css">
@@ -16,7 +16,7 @@
     <div class="pageHead">
       <h1>ROI Calculator</h1>
       <p class="subtitle">
-        Calculate profit, return on investment, and percentage return instantly.
+        Calculate profit, return on investment, percentage return, and annualised ROI.
       </p>
     </div>
 
@@ -24,13 +24,36 @@
 
       <div class="row">
         <div>
-          <label for="investment">Initial investment (£)</label>
-          <input id="investment" type="number" inputmode="decimal" min="0" step="0.01" value="1000">
+          <label for="currency">Currency</label>
+          <select id="currency">
+            <option value="GBP">GBP — British Pound (£)</option>
+            <option value="USD">USD — US Dollar ($)</option>
+            <option value="EUR">EUR — Euro (€)</option>
+            <option value="CAD">CAD — Canadian Dollar (CA$)</option>
+            <option value="AUD">AUD — Australian Dollar (A$)</option>
+            <option value="INR">INR — Indian Rupee (₹)</option>
+            <option value="BRL">BRL — Brazilian Real (R$)</option>
+            <option value="MXN">MXN — Mexican Peso (MX$)</option>
+            <option value="SGD">SGD — Singapore Dollar (S$)</option>
+            <option value="NZD">NZD — New Zealand Dollar (NZ$)</option>
+          </select>
         </div>
 
         <div>
-          <label for="returnAmount">Final value (£)</label>
+          <label for="investment">Initial investment</label>
+          <input id="investment" type="number" inputmode="decimal" min="0" step="0.01" value="1000">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="returnAmount">Final value</label>
           <input id="returnAmount" type="number" inputmode="decimal" min="0" step="0.01" value="1500">
+        </div>
+
+        <div>
+          <label for="years">Time period (years) <span class="hint">optional — for annualised ROI</span></label>
+          <input id="years" type="number" inputmode="decimal" min="0" step="0.5" value="0" placeholder="e.g. 3">
         </div>
       </div>
 
@@ -50,9 +73,15 @@
           </div>
 
           <div class="kpiBox">
-            <div class="label">ROI Percentage</div>
+            <div class="label">ROI</div>
             <div class="value" id="roiPercent">—</div>
-            <div class="muted">Return on investment</div>
+            <div class="muted">Total return</div>
+          </div>
+
+          <div class="kpiBox" id="annualisedBox" style="display:none;">
+            <div class="label">Annualised ROI</div>
+            <div class="value" id="annualisedRoi">—</div>
+            <div class="muted">Per year (CAGR)</div>
           </div>
         </div>
 
@@ -61,7 +90,7 @@
       </div>
 
       <div class="muted note">
-        ROI = (Profit ÷ Investment) × 100
+        ROI = (Profit ÷ Investment) × 100 · Annualised ROI = ((Final ÷ Initial) ^ (1 ÷ Years) − 1) × 100
       </div>
 
     </div>
@@ -73,67 +102,71 @@
   </div>
 
 <script>
+  const money = (n) => {
+    const cur = document.getElementById("currency").value || "GBP";
+    const v = Number.isFinite(n) ? n : 0;
+    try {
+      return new Intl.NumberFormat(undefined, { style: "currency", currency: cur }).format(v);
+    } catch {
+      return v.toFixed(2) + " " + cur;
+    }
+  };
 
-const fmtGBP = (n) => {
-  return new Intl.NumberFormat(undefined, {
-    style: "currency",
-    currency: "GBP"
-  }).format(n);
-};
+  const fmtPct = (n) => (Number.isFinite(n) ? n : 0).toFixed(2) + "%";
 
-const fmtPercent = (n) => {
-  return n.toFixed(2) + "%";
-};
+  const getVal = (id) => {
+    const v = parseFloat(document.getElementById(id).value);
+    return Number.isFinite(v) ? v : 0;
+  };
 
-function getVal(id){
-  const v = parseFloat(document.getElementById(id).value);
-  return Number.isFinite(v) ? v : 0;
-}
+  function calculate() {
+    const investment = Math.max(0, getVal("investment"));
+    const finalValue = Math.max(0, getVal("returnAmount"));
+    const years      = Math.max(0, getVal("years"));
 
-function calculate(){
+    const profit = finalValue - investment;
+    const roi    = investment > 0 ? (profit / investment) * 100 : 0;
 
-  const investment = Math.max(0, getVal("investment"));
-  const finalValue = Math.max(0, getVal("returnAmount"));
+    document.getElementById("profit").textContent     = money(profit);
+    document.getElementById("roiPercent").textContent = fmtPct(roi);
 
-  const profit = finalValue - investment;
+    // Annualised ROI (CAGR) — only show if years > 0
+    const annBox = document.getElementById("annualisedBox");
+    if (years > 0 && investment > 0 && finalValue > 0) {
+      const cagr = (Math.pow(finalValue / investment, 1 / years) - 1) * 100;
+      document.getElementById("annualisedRoi").textContent = fmtPct(cagr);
+      annBox.style.display = "block";
+    } else {
+      annBox.style.display = "none";
+    }
 
-  let roi = 0;
-
-  if(investment > 0){
-    roi = (profit / investment) * 100;
+    document.getElementById("breakdown").textContent =
+      `Investment: ${money(investment)} · Final value: ${money(finalValue)} · Profit: ${money(profit)} · ROI: ${fmtPct(roi)}` +
+      (years > 0 ? ` · Period: ${years}y` : "");
   }
 
-  document.getElementById("profit").textContent = fmtGBP(profit);
-  document.getElementById("roiPercent").textContent = fmtPercent(roi);
+  function resetAll() {
+    document.getElementById("currency").value      = "GBP";
+    document.getElementById("investment").value    = 1000;
+    document.getElementById("returnAmount").value  = 1500;
+    document.getElementById("years").value         = 0;
+    document.getElementById("annualisedBox").style.display = "none";
+    calculate();
+  }
 
-  document.getElementById("breakdown").textContent =
-    `Investment: ${fmtGBP(investment)} · Final value: ${fmtGBP(finalValue)} · Profit: ${fmtGBP(profit)} · ROI: ${fmtPercent(roi)}`;
+  document.getElementById("calcBtn").addEventListener("click", calculate);
+  document.getElementById("resetBtn").addEventListener("click", resetAll);
 
-}
-
-function resetAll(){
-
-  document.getElementById("investment").value = 1000;
-  document.getElementById("returnAmount").value = 1500;
-
-  calculate();
-
-}
-
-document.getElementById("calcBtn").addEventListener("click", calculate);
-document.getElementById("resetBtn").addEventListener("click", resetAll);
-
-["investment","returnAmount"].forEach(id => {
-  document.getElementById(id).addEventListener("input", calculate);
-  document.getElementById(id).addEventListener("keydown", e => {
-    if(e.key === "Enter") calculate();
+  ["currency","investment","returnAmount","years"].forEach(id => {
+    document.getElementById(id).addEventListener("input", calculate);
+    document.getElementById(id).addEventListener("change", calculate);
+    document.getElementById(id).addEventListener("keydown", (e) => {
+      if (e.key === "Enter") calculate();
+    });
   });
-});
 
-document.getElementById("yearNow").textContent = new Date().getFullYear();
-
-calculate();
-
+  document.getElementById("yearNow").textContent = new Date().getFullYear();
+  calculate();
 </script>
 
 </body>
